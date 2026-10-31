@@ -391,7 +391,8 @@ const sites=S.map((s,i)=>({id:i,name:s[0],cat:s[1],sub:s[2],feat:!!s[3],bg:s[4],
 const $=id=>document.getElementById(id);
 const ver='<svg viewBox="0 0 24 24" class="verified"><path fill="currentColor" d="M12 1.5l2.4 1.8 3-.2.9 2.9 2.5 1.7-.9 2.9.9 2.9-2.5 1.7-.9 2.9-3-.2L12 22.5l-2.4-1.8-3 .2-.9-2.9-2.5-1.7.9-2.9-.9-2.9 2.5-1.7.9-2.9 3 .2z"/><path fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" d="m8 12.2 2.6 2.6L16 9.4"/></svg>';
 const esc=t=>t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const shot=u=>"https://api.microlink.io/?url="+encodeURIComponent(u)+"&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1440&viewport.height=900";
+const home=u=>{try{return new URL(u).origin+"/"}catch{return u}};
+const shot=u=>"https://api.microlink.io/?url="+encodeURIComponent(home(u))+"&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1440&viewport.height=900&waitUntil=networkidle2&waitForTimeout=3000&colorScheme=no-preference";
 const fav=u=>{try{return "https://www.google.com/s2/favicons?sz=64&domain="+new URL(u).hostname}catch{return ""}};
 const thumb=s=>`<div class="thumb" style="background:${s.bg};color:${s.fg}">${s.url?`<img src="${s.img||shot(s.url)}" alt="${esc(s.name)} preview" loading="lazy" style="position:absolute;inset:0;z-index:1" onerror="this.remove()">`:""}<div class="mock"><div class="bar"><span></span><span></span><span></span><span></span></div><b>${esc(s.hero)}</b><i>${esc(s.name)}</i><div class="blocks"><span></span><span></span><span></span></div></div></div>`;
 const card=(s,i)=>`<a href="#${s.slug}" class="card" data-reveal style="--i:${i%8}">${thumb(s)}<div class="card-meta"><strong>${esc(s.name)}</strong>${s.feat?ver:""}<span class="dot">·</span><span class="sub">${esc(s.sub)}</span></div></a>`;

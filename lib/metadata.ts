@@ -148,7 +148,7 @@ export async function fetchMetadata(rawUrl: string): Promise<FetchedMeta> {
 }
 
 const DEFAULT_SCREENSHOT_SERVICE =
-  "https://api.microlink.io/?url={url}&screenshot=true&meta=false&viewport.width=1440&viewport.height=900&waitForTimeout=1500";
+  "https://api.microlink.io/?url={url}&screenshot=true&meta=false&viewport.width=1440&viewport.height=900&waitUntil=networkidle2&waitForTimeout=3000";
 
 /**
  * Screenshot of the live site via a screenshot service (Microlink free tier by default,
@@ -156,7 +156,10 @@ const DEFAULT_SCREENSHOT_SERVICE =
  */
 export async function screenshotUrl(target: string) {
   const tpl = process.env.SCREENSHOT_SERVICE_URL || DEFAULT_SCREENSHOT_SERVICE;
-  const url = tpl.replace("{url}", encodeURIComponent(target));
+  // Always capture the site's home page, even when a deeper link was pasted.
+  let home = target;
+  try { home = new URL(target).origin + "/"; } catch { /* keep as is */ }
+  const url = tpl.replace("{url}", encodeURIComponent(home));
   try {
     const res = await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(25000) });
     if (res.status >= 300 && res.status < 400) return res.headers.get("location");
