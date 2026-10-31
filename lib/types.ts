@@ -1,0 +1,23 @@
+export type Category = { id: string; name: string; slug: string; icon: string; position: number };
+export type CategoryCount = Category & { site_count: number };
+export type Tag = { id: string; name: string; slug: string };
+export type Site = {
+  id: string;
+  name: string;
+  slug: string;
+  url: string;
+  canonical_url: string | null;
+  short_description: string;
+  description: string;
+  thumbnail_path: string | null;
+  thumbnail_url: string | null;
+  favicon_url: string | null;
+  category_id: string | null;
+  design_style: string;
+  featured: boolean;
+  status: "draft" | "published";
+  position: number;
+  created_at: string;
+  updated_at: string;
+};
+export type SiteFull = Site & { category: Category | null; tags: Tag[] };

@@ -1,0 +1,70 @@
+"use client";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import type { CategoryCount, Tag } from "@/lib/types";
+import { Icon } from "./Icon";
+import { Logo } from "./Logo";
+
+export function Sidebar({ categories, tags }: { categories: CategoryCount[]; tags: Tag[] }) {
+  const pathname = usePathname();
+  const [open, setOpen] = useState(false);
+  const [catsOpen, setCatsOpen] = useState(true);
+  const [tagsOpen, setTagsOpen] = useState(false);
+
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    const h = () => setOpen((o) => !o);
+    window.addEventListener("miranda:toggle-sidebar", h);
+    return () => window.removeEventListener("miranda:toggle-sidebar", h);
+  }, []);
+
+  const cur = (href: string) => (pathname === href ? "page" : undefined);
+
+  return (
+    <>
+      {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 39, background: "rgba(0,0,0,.5)" }} />}
+      <aside className="sidebar" data-open={open}>
+        <Link href="/" className="logo" aria-label="Miranda home"><Logo /></Link>
+        <div className="sidebar-scroll">
+          <button className="nav-item" style={{ width: "calc(100% - 8px)", background: "none", border: 0 }}
+            onClick={() => window.dispatchEvent(new Event("miranda:open-search"))}>
+            <Icon name="search" /> Search <span className="kbd">⌘ K</span>
+          </button>
+          <div style={{ height: 6 }} />
+          <Link className="nav-item" href="/" aria-current={cur("/")}><Icon name="compass" /> Explore</Link>
+          <Link className="nav-item" href="/featured" aria-current={cur("/featured")}><Icon name="bolt" /> Featured</Link>
+          <Link className="nav-item" href="/all" aria-current={cur("/all")}><Icon name="folders" /> All websites</Link>
+          <div style={{ height: 10 }} />
+
+          <button className="nav-group" aria-expanded={tagsOpen} onClick={() => setTagsOpen((v) => !v)}>
+            Tags <Icon name="chevron" />
+          </button>
+          <div className="collapse" data-open={tagsOpen}>
+            <div>
+              {tags.map((t) => (
+                <Link key={t.id} className="nav-item" href={`/tag/${t.slug}`} aria-current={cur(`/tag/${t.slug}`)}>
+                  <Icon name="tag" /> {t.name}
+                </Link>
+              ))}
+              {!tags.length && <p className="nav-item" style={{ color: "var(--dim)" }}>No tags yet</p>}
+            </div>
+          </div>
+
+          <button className="nav-group" aria-expanded={catsOpen} onClick={() => setCatsOpen((v) => !v)}>
+            Categories <Icon name="chevron" />
+          </button>
+          <div className="collapse" data-open={catsOpen}>
+            <div style={{ paddingTop: 4 }}>
+              {categories.map((c) => (
+                <Link key={c.id} className="nav-item" href={`/category/${c.slug}`} aria-current={cur(`/category/${c.slug}`)}>
+                  <Icon name={c.icon} /> {c.name} <span className="nav-count">{c.site_count}</span>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </aside>
+    </>
+  );
+}
