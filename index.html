@@ -360,7 +360,7 @@ h1,h2,h3,p{margin:0}
 <label class="mf">Name<input id="aName" required maxlength="120"></label>
 <label class="mf">Short description<input id="aSub" maxlength="160"></label>
 <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><label class="mf">Category<select id="aCat"></select><input id="aCatNew" placeholder="New category name" maxlength="60" hidden></label><label class="mf">Tag / style<select id="aTag"></select><input id="aTagNew" placeholder="New tag name" maxlength="40" hidden></label></div>
-<p style="font-size:12px;color:var(--muted)">The website preview is captured automatically from the link. In the real app it shows a live screenshot; this preview page can’t load images from other sites, so it shows a placeholder.</p>
+<p style="font-size:12px;color:var(--muted)">The website preview is captured automatically from the link (it can take a few seconds to appear).</p>
 <label style="display:flex;gap:8px;align-items:center;font-size:13px"><input type="checkbox" id="aFeat"> Featured</label>
 <p id="aErr" class="merr" hidden></p>
 <div style="display:flex;gap:8px"><button class="btn-pill" style="border:0;padding:9px 16px">Publish</button><button type="button" class="btn-ghost" data-close style="background:none;border:0">Cancel</button></div>
@@ -391,9 +391,11 @@ const sites=S.map((s,i)=>({id:i,name:s[0],cat:s[1],sub:s[2],feat:!!s[3],bg:s[4],
 const $=id=>document.getElementById(id);
 const ver='<svg viewBox="0 0 24 24" class="verified"><path fill="currentColor" d="M12 1.5l2.4 1.8 3-.2.9 2.9 2.5 1.7-.9 2.9.9 2.9-2.5 1.7-.9 2.9-3-.2L12 22.5l-2.4-1.8-3 .2-.9-2.9-2.5-1.7.9-2.9-.9-2.9 2.5-1.7.9-2.9 3 .2z"/><path fill="none" stroke="#000" stroke-width="2.2" stroke-linecap="round" d="m8 12.2 2.6 2.6L16 9.4"/></svg>';
 const esc=t=>t.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const thumb=s=>s.img?`<div class="thumb"><img src="${s.img}" alt="${esc(s.name)} preview"></div>`:`<div class="thumb" style="background:${s.bg};color:${s.fg}"><div class="mock"><div class="bar"><span></span><span></span><span></span><span></span></div><b>${esc(s.hero)}</b><i>${esc(s.name)}</i><div class="blocks"><span></span><span></span><span></span></div></div></div>`;
+const shot=u=>"https://api.microlink.io/?url="+encodeURIComponent(u)+"&screenshot=true&meta=false&embed=screenshot.url&viewport.width=1440&viewport.height=900";
+const fav=u=>{try{return "https://www.google.com/s2/favicons?sz=64&domain="+new URL(u).hostname}catch{return ""}};
+const thumb=s=>`<div class="thumb" style="background:${s.bg};color:${s.fg}">${s.url?`<img src="${s.img||shot(s.url)}" alt="${esc(s.name)} preview" loading="lazy" style="position:absolute;inset:0;z-index:1" onerror="this.remove()">`:""}<div class="mock"><div class="bar"><span></span><span></span><span></span><span></span></div><b>${esc(s.hero)}</b><i>${esc(s.name)}</i><div class="blocks"><span></span><span></span><span></span></div></div></div>`;
 const card=(s,i)=>`<a href="#${s.slug}" class="card" data-reveal style="--i:${i%8}">${thumb(s)}<div class="card-meta"><strong>${esc(s.name)}</strong>${s.feat?ver:""}<span class="dot">·</span><span class="sub">${esc(s.sub)}</span></div></a>`;
-const mini=(s,i)=>`<a href="#${s.slug}" class="mini" data-reveal style="--i:${i%8}"><span class="mini-icon" style="background:${s.fg};color:${s.bg};font-size:17px">${s.name[0]}</span><span style="min-width:0"><span class="mini-title">${esc(s.name)} ${s.feat?ver:""}</span><span class="mini-sub" style="display:block">${esc(s.sub)}</span></span></a>`;
+const mini=(s,i)=>`<a href="#${s.slug}" class="mini" data-reveal style="--i:${i%8}"><span class="mini-icon" style="background:#fff;color:#000;font-size:17px;position:relative">${s.name[0]}${s.url?`<img src="${fav(s.url)}" alt="" style="position:absolute;inset:6px;width:28px;height:28px" onerror="this.remove()">`:""}</span><span style="min-width:0"><span class="mini-title">${esc(s.name)} ${s.feat?ver:""}</span><span class="mini-sub" style="display:block">${esc(s.sub)}</span></span></a>`;
 let filter={cat:null,feat:false,q:"",tag:null,style:null,sort:"latest"};
 let openDD=null;
 const SORTS={latest:"Latest",oldest:"Oldest",name:"A–Z"};
