@@ -3,7 +3,8 @@ import { createClient as createJsClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 export function hasSupabaseEnv() {
-  return Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  return Boolean(url && /^https:\/\/[^\s]+$/.test(url) && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 }
 
 /** Request-scoped client carrying the visitor's session (RLS applies). */

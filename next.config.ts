@@ -1,8 +1,14 @@
 import type { NextConfig } from "next";
 
-const supabaseHost = process.env.NEXT_PUBLIC_SUPABASE_URL
-  ? new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname
-  : undefined;
+function hostOf(url?: string) {
+  try {
+    return url ? new URL(url).hostname : undefined;
+  } catch {
+    console.warn("NEXT_PUBLIC_SUPABASE_URL is not a valid URL — check your environment variables.");
+    return undefined;
+  }
+}
+const supabaseHost = hostOf(process.env.NEXT_PUBLIC_SUPABASE_URL);
 
 const config: NextConfig = {
   images: {
