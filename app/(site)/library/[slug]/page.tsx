@@ -5,7 +5,8 @@ import { getLibraries } from "@/lib/queries";
 type P = { params: Promise<{ slug: string }>; searchParams: Promise<SP> };
 
 export async function generateMetadata({ params }: P) {
-  const l = (await getLibraries()).find((x) => x.slug === (await params).slug);
+  const { slug } = await params;
+  const l = (await getLibraries()).find((x) => x.slug === slug);
   return { title: l?.name ?? "Library" };
 }
 
