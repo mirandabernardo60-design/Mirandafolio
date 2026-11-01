@@ -85,6 +85,7 @@ export function Sidebar({ categories, tags, libraries = [] }: { categories: Cate
                   <Icon name={c.icon} /> {c.name} <span className="nav-count">{c.site_count}</span>
                 </Link>
               ))}
+              {!categories.length && <p className="nav-item" style={{ color: "var(--dim)" }}>No categories yet</p>}
             </div>
           </div>
         </div>

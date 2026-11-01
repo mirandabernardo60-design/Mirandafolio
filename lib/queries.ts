@@ -23,12 +23,17 @@ function orderFor(q: any, sort: Sort) {
 const _getCategories = (async (): Promise<CategoryCount[]> => {
   if (!hasSupabaseEnv()) return [];
   const db = createPublicClient();
-  const { data, error } = await db.from("category_counts").select("*").order("position").order("name");
-  if (!error) return (data ?? []) as CategoryCount[];
-  // Fallback if the counts view is unavailable: list categories without counts.
-  const r = await db.from("categories").select("*").order("position").order("name");
-  if (r.error) throw r.error; // don't cache a failure
-  return (r.data ?? []).map((c) => ({ ...c, site_count: 0 })) as CategoryCount[];
+  // Read categories directly (no view) and count published websites per category.
+  const [cats, sites] = await Promise.all([
+    db.from("categories").select("id, name, slug, icon, position").order("position").order("name"),
+    db.from("sites").select("category_id").eq("status", "published"),
+  ]);
+  if (cats.error) throw cats.error; // don't cache a failure
+  const counts = new Map<string, number>();
+  for (const r of (sites.data ?? []) as { category_id: string | null }[]) {
+    if (r.category_id) counts.set(r.category_id, (counts.get(r.category_id) ?? 0) + 1);
+  }
+  return (cats.data ?? []).map((c) => ({ ...c, site_count: counts.get(c.id) ?? 0 })) as CategoryCount[];
 });
 
 const _getTags = (async (): Promise<Tag[]> => {
@@ -195,14 +200,14 @@ async function _getSiteExtras(siteId: string) {
 function cached<A extends unknown[], R>(fn: (...a: A) => Promise<R>, key: string) {
   return (...a: A) => unstable_cache(() => fn(...a), [key, JSON.stringify(a)], { tags: ["public"], revalidate: 300 })();
 }
-export const getCategories = cached(_getCategories, "getCategories");
-export const getTags = cached(_getTags, "getTags");
+export const getCategories = cached(_getCategories, "getCategories-v2");
+export const getTags = cached(_getTags, "getTags-v2");
 export const getPublishedCount = cached(_getPublishedCount, "getPublishedCount");
 export const listSites = cached(_listSites, "listSites");
 export const getSiteBySlug = cached(_getSiteBySlug, "getSiteBySlug");
 export const getRelated = cached(_getRelated, "getRelated");
 export const getStyles = cached(_getStyles, "getStyles");
-export const getLibraries = cached(_getLibraries, "getLibraries");
+export const getLibraries = cached(_getLibraries, "getLibraries-v2");
 export const listCollections = cached(_listCollections, "listCollections");
 export const getCollection = cached(_getCollection, "getCollection");
 export const getSiteExtras = cached(_getSiteExtras, "getSiteExtras");
