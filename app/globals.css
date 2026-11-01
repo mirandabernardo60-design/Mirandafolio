@@ -678,3 +678,35 @@ img, video, svg { max-width: 100%; }
   .sidebar .logo { height: 60px; padding: 0 16px; }
   .sidebar .logo-word { font-size: 22px; }
 }
+
+/* ===== Phone home, measured from toolfolio.com at 390px ===== */
+@media (max-width: 860px) {
+  .filterbar[data-home="true"] { display: none; }
+  .m-brand { height: calc(52px + env(safe-area-inset-top, 0px)); padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(14px, env(safe-area-inset-right, 0px)); }
+  .m-brand .logo-word { font-size: 20px; }
+  .topbar { height: 53px; padding-left: max(20px, env(safe-area-inset-left, 0px)); }
+  .top-tabs { gap: 32px; }
+  .top-tabs a { font-size: 14px !important; padding: 0 4px; }
+  .page { padding-left: max(20px, env(safe-area-inset-left, 0px)); padding-right: max(20px, env(safe-area-inset-right, 0px)); padding-top: 20px; }
+  .section { margin-top: 36px; }
+  .section-head { margin-bottom: 20px; }
+  .section-head h2 { font-size: 20px !important; }
+
+  /* Hero card */
+  .hero-slide { min-height: 0; border-radius: 16px; }
+  .hero-shot { aspect-ratio: 350 / 184; }
+  .hero-info { padding: 20px; min-height: 236px; }
+  .hero-icon { width: 56px; height: 56px; border-radius: 13px; }
+  .hero-info h2 { font-size: 22px !important; line-height: 1.25; margin-top: 18px; }
+  .hero-info p { font-size: 15px !important; -webkit-line-clamp: 2; margin-top: 10px; }
+  .hero-tag { font-size: 13px; padding-top: 16px; }
+
+  /* Featured: stacked like Toolfolio (not a sideways carousel) */
+  .carousel:has(> .card) { grid-auto-flow: row; grid-auto-columns: auto; grid-template-columns: minmax(0, 1fr); gap: 24px; overflow: visible; scroll-snap-type: none; }
+
+  /* New Additions: sideways columns of four */
+  .grid-mini { grid-auto-flow: column; grid-template-rows: repeat(4, auto); grid-template-columns: none; grid-auto-columns: calc(100% - 24px);
+    overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; gap: 8px 16px; margin-right: -20px; padding-right: 20px; }
+  .grid-mini::-webkit-scrollbar { display: none; }
+  .grid-mini > * { scroll-snap-align: start; }
+}

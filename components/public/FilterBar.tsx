@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import type { CategoryCount, Tag } from "@/lib/types";
 import { Icon } from "./Icon";
 
-type Props = { categories: CategoryCount[]; tags: Tag[]; styles: string[]; count: number; lockCategory?: boolean };
+type Props = { home?: boolean; categories: CategoryCount[]; tags: Tag[]; styles: string[]; count: number; lockCategory?: boolean };
 
 const SORTS = [
   { v: "latest", l: "Latest" },
@@ -32,7 +32,7 @@ function Dropdown({ label, active, children }: { label: string; active?: boolean
   );
 }
 
-export function FilterBar({ categories, tags, styles, count, lockCategory }: Props) {
+export function FilterBar({ home, categories, tags, styles, count, lockCategory }: Props) {
   const sp = useSearchParams();
   const pathname = usePathname();
   const router = useRouter();
@@ -59,7 +59,7 @@ export function FilterBar({ categories, tags, styles, count, lockCategory }: Pro
   const pricing = sp.get("pricing");
 
   return (
-    <div className="filterbar">
+    <div className="filterbar" data-home={home ? "true" : undefined}>
       {!lockCategory && (
         <Dropdown label="Categories">
           {categories.map((c) => (

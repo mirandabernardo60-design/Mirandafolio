@@ -37,7 +37,7 @@ export async function Listing({
     <>
       <Topbar title={title} tabs={showHome && !category || latestOnly ? [{ href: "/", label: "Explore", active: !latestOnly }, { href: "/latest", label: "Latest Additions", active: !!latestOnly }] : undefined} />
       <Suspense>
-        <FilterBar categories={categories} tags={tags} styles={styles} count={all.length} lockCategory={!!category} />
+        <FilterBar home={!!showHome && !category} categories={categories} tags={tags} styles={styles} count={all.length} lockCategory={!!category} />
       </Suspense>
       <div className="page">
         {showHome && !filtering && (featured.length || recent.length
