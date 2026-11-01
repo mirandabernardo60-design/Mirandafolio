@@ -52,6 +52,7 @@ export type ListParams = {
   library?: string; // slug
   collection?: string; // id
   style?: string;
+  pricing?: string;
   sort?: Sort;
   featured?: boolean;
   limit?: number;
@@ -94,6 +95,7 @@ export async function listSites(p: ListParams = {}): Promise<SiteFull[]> {
     q = q.eq("category_id", cat.id);
   }
   if (p.style) q = q.ilike("design_style", p.style);
+  if (p.pricing) q = q.eq("pricing", p.pricing);
   if (p.featured) q = q.eq("featured", true);
   q = orderFor(q, p.sort ?? "latest");
   if (p.limit) q = q.limit(p.limit);

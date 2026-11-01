@@ -19,7 +19,7 @@ export function Thumb({ site, eager }: { site: SiteFull; eager?: boolean }) {
 
 export function SiteCard({ site, eager }: { site: SiteFull; eager?: boolean }) {
   const blurb = site.description || site.short_description;
-  const label = site.design_style || site.category?.name;
+  const label = site.pricing || site.design_style || site.category?.name;
   return (
     <div className="card" data-reveal>
       <Link href={`/references/${site.slug}`} className="card-link" aria-label={site.name}>

@@ -9,7 +9,7 @@ import { getRelated, getSiteBySlug, getSiteExtras } from "@/lib/queries";
 import { AddToCollection } from "@/components/public/AddToCollection";
 import { getViewer } from "@/lib/viewer";
 import { createClient } from "@/lib/supabase/server";
-import { formatDate, hostname, thumbnailSrc } from "@/lib/utils";
+import { formatDate, hostname, pageShot, thumbnailSrc } from "@/lib/utils";
 
 type P = { params: Promise<{ slug: string }> };
 
@@ -63,9 +63,16 @@ export default async function ReferencePage({ params }: P) {
           </div>
 
           <div className="detail-shot" data-reveal>
-            <a href={site.url} target="_blank" rel="noopener noreferrer" className="card" aria-label={`Open ${site.name}`}>
-              <Thumb site={site} eager />
-            </a>
+            <div className="gallery">
+              <a href={site.url} target="_blank" rel="noopener noreferrer" className="gallery-item card" aria-label={`Open ${site.name}`}>
+                <Thumb site={site} eager />
+              </a>
+              {(site.gallery_pages ?? []).map((u) => (
+                <a key={u} href={u} target="_blank" rel="noopener noreferrer" className="gallery-item card" aria-label={`Open ${u}`}>
+                  <div className="thumb"><img src={pageShot(u)} alt={`${site.name} — ${hostname(u)}${new URL(u).pathname}`} loading="lazy" /></div>
+                </a>
+              ))}
+            </div>
           </div>
 
           <div className="detail-body">
@@ -73,6 +80,14 @@ export default async function ReferencePage({ params }: P) {
               <p className="eyebrow">About</p>
               <h2>{site.short_description || site.name}</h2>
               {site.description && <p className="prose">{site.description}</p>}
+              {(site.features ?? []).length > 0 && (
+                <>
+                  <p className="eyebrow" style={{ marginTop: 32 }}>Features &amp; use cases</p>
+                  <ul className="features">
+                    {(site.features ?? []).map((x) => <li key={x}><Icon name="right" width={13} /> {x}</li>)}
+                  </ul>
+                </>
+              )}
 
               {site.tags.length > 0 && (
                 <>
@@ -90,6 +105,18 @@ export default async function ReferencePage({ params }: P) {
               )}
             </div>
             <div data-reveal style={{ display: "grid", gap: 22, alignContent: "start" }}>
+              {site.pricing && <div><p className="eyebrow">Pricing</p><p style={{ fontWeight: 500 }}>
+                <Link href={`/all?pricing=${encodeURIComponent(site.pricing)}`}>{site.pricing}</Link></p></div>}
+              {Object.keys(site.social ?? {}).length > 0 && (
+                <div><p className="eyebrow">Links</p>
+                  <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                    {Object.entries(site.social ?? {}).map(([k, href]) => (
+                      <a key={k} href={href} target="_blank" rel="noopener noreferrer" className="social-link" aria-label={k}>
+                        <Icon name={k === "x" ? "sx" : k} width={16} />
+                      </a>
+                    ))}
+                  </div></div>
+              )}
               {site.design_style && (
                 <div><p className="eyebrow">Design style</p><p style={{ fontWeight: 500 }}>
                   <Link href={`/all?style=${encodeURIComponent(site.design_style)}`}>{site.design_style}</Link></p></div>

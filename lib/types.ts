@@ -19,7 +19,12 @@ export type Site = {
   position: number;
   created_at: string;
   updated_at: string;
+  pricing?: string;
+  features?: string[];
+  social?: Partial<Record<SocialKey, string>>;
+  gallery_pages?: string[];
 };
+export type SocialKey = "x" | "linkedin" | "instagram" | "github" | "youtube" | "dribbble" | "behance";
 export type SiteFull = Site & { category: Category | null; tags: Tag[] };
 export type ArticleSite = { id: string; name: string; slug: string; favicon_url: string | null };
 export type Article = {

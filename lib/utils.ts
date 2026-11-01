@@ -26,3 +26,8 @@ export function formatDate(iso: string) {
 export function cn(...c: (string | false | null | undefined)[]) {
   return c.filter(Boolean).join(" ");
 }
+
+/** Live screenshot of any public page (WordPress mShots, same service as thumbnails). */
+export function pageShot(url: string, w = 1440, h = 900) {
+  return `https://s.wordpress.com/mshots/v1/${encodeURIComponent(url)}?w=${w}&h=${h}`;
+}

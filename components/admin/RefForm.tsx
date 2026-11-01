@@ -44,7 +44,13 @@ export function RefForm({ site, categories, allTags, libraries = [] }: Props) {
     tags: site?.tags ?? ([] as string[]),
     new_category: "",
     library_ids: site?.library_ids ?? ([] as string[]),
+    pricing: (site?.pricing ?? "") as string,
+    features: site?.features ?? ([] as string[]),
+    social: (site?.social ?? {}) as Record<string, string>,
+    gallery_pages: site?.gallery_pages ?? ([] as string[]),
   });
+  const [featuresText, setFeaturesText] = useState((site?.features ?? []).join("\n"));
+  const [pagesText, setPagesText] = useState((site?.gallery_pages ?? []).join("\n"));
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
 
   useEffect(() => {
@@ -98,7 +104,9 @@ export function RefForm({ site, categories, allTags, libraries = [] }: Props) {
     setErrors({});
     if (newCat && !f.new_category.trim()) { setErrors({ new_category: "Type a name for the new category" }); return; }
     const fd = new FormData();
-    fd.set("payload", JSON.stringify({ ...f, status }));
+    const features = featuresText.split("\n").map((x) => x.trim()).filter(Boolean);
+    const gallery_pages = pagesText.split("\n").map((x) => x.trim()).filter(Boolean).map((x) => (/^https?:\/\//i.test(x) ? x : `https://${x}`));
+    fd.set("payload", JSON.stringify({ ...f, features, gallery_pages, status }));
     if (newShot) fd.set("persistScreenshot", "1");
     start(async () => {
       const r = await saveSite(site?.id ?? null, fd);
@@ -157,6 +165,28 @@ export function RefForm({ site, categories, allTags, libraries = [] }: Props) {
             </label>
             <label className="adm-label">Design style
               <input className="adm-input" name="design_style" placeholder="e.g. Minimal, Brutalist, 3D" value={f.design_style} onChange={(e) => set("design_style", e.target.value)} /></label>
+          </div>
+          <div className="adm-row2">
+            <label className="adm-label">Pricing
+              <select className="adm-select" value={f.pricing} onChange={(e) => set("pricing", e.target.value)}>
+                <option value="">— Not set —</option>
+                {["Free", "Freemium", "Paid", "One-time", "Subscription", "Open source"].map((p) => <option key={p}>{p}</option>)}
+              </select></label>
+            <span />
+          </div>
+          <label className="adm-label">Features &amp; use cases <span style={{ fontWeight: 400, color: "var(--dim)" }}>(one per line)</span>
+            <textarea className="adm-textarea" style={{ minHeight: 110 }} value={featuresText} onChange={(e) => setFeaturesText(e.target.value)}
+              placeholder={"Bold editorial typography\nScroll-driven case studies\nCustom cursor and page transitions"} />{err("features")}</label>
+          <label className="adm-label">Extra pages to screenshot <span style={{ fontWeight: 400, color: "var(--dim)" }}>(one URL per line, up to 8 — e.g. /about, /work)</span>
+            <textarea className="adm-textarea" style={{ minHeight: 80 }} value={pagesText} onChange={(e) => setPagesText(e.target.value)}
+              placeholder={"https://example.com/about\nhttps://example.com/work"} />{err("gallery_pages")}</label>
+          <div className="adm-label">Social links
+            <div className="adm-row2">
+              {(["x", "linkedin", "instagram", "github", "youtube", "dribbble", "behance"] as const).map((k) => (
+                <input key={k} className="adm-input" aria-label={k} placeholder={{ x: "X / Twitter", linkedin: "LinkedIn", instagram: "Instagram", github: "GitHub", youtube: "YouTube", dribbble: "Dribbble", behance: "Behance" }[k] + " URL"}
+                  value={f.social[k] ?? ""} onChange={(e) => set("social", { ...f.social, [k]: e.target.value })} />
+              ))}
+            </div>{err("social")}
           </div>
           {libraries.length > 0 && (
             <div className="adm-label">Libraries <span style={{ fontWeight: 400, color: "var(--dim)" }}>(what it’s built with: Framer, Webflow…)</span>

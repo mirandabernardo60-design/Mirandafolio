@@ -12,7 +12,7 @@ import { Icon } from "./Icon";
 import { Topbar } from "./Topbar";
 import { getCategories, getStyles, getTags, listSites, type Sort } from "@/lib/queries";
 
-export type SP = { q?: string; tag?: string; style?: string; sort?: string };
+export type SP = { q?: string; tag?: string; style?: string; pricing?: string; sort?: string };
 
 /** Shared browsing page used by Explore, category, tag, featured and all pages. */
 export async function Listing({
@@ -21,8 +21,8 @@ export async function Listing({
   title: string; sp: SP; category?: string; tag?: string; library?: string; featuredOnly?: boolean; showHome?: boolean;
 }) {
   const sort = (["latest", "oldest", "name", "custom"].includes(sp.sort ?? "") ? sp.sort : "latest") as Sort;
-  const filters = { q: sp.q, tag: tag ?? sp.tag, style: sp.style, category, library, sort, featured: featuredOnly };
-  const filtering = Boolean(sp.q || sp.tag || sp.style);
+  const filters = { q: sp.q, tag: tag ?? sp.tag, style: sp.style, pricing: sp.pricing, category, library, sort, featured: featuredOnly };
+  const filtering = Boolean(sp.q || sp.tag || sp.style || sp.pricing);
   const collections = showHome && !category && !filtering ? await listCollections({ sort: "size", limit: 9 }) : [];
   const articles = filtering || featuredOnly || tag || library ? [] : await listArticles({ category, limit: 9 });
 

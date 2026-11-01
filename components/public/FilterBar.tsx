@@ -56,6 +56,7 @@ export function FilterBar({ categories, tags, styles, count, lockCategory }: Pro
   const sort = sp.get("sort") ?? "latest";
   const tag = sp.get("tag");
   const style = sp.get("style");
+  const pricing = sp.get("pricing");
 
   return (
     <div className="filterbar">
@@ -77,6 +78,12 @@ export function FilterBar({ categories, tags, styles, count, lockCategory }: Pro
         {style && <Link href={href("style", null)}>Clear</Link>}
         {styles.map((s) => <Link key={s} href={href("style", s)} aria-current={s === style}>{s}</Link>)}
         {!styles.length && <span style={{ padding: 8, color: "var(--dim)", fontSize: 12 }}>No styles</span>}
+      </Dropdown>
+      <Dropdown label={pricing ? `Pricing: ${pricing}` : "Pricing"} active={!!pricing}>
+        {pricing && <Link href={href("pricing", null)}>Clear</Link>}
+        {["Free", "Freemium", "Paid", "One-time", "Subscription", "Open source"].map((p) => (
+          <Link key={p} href={href("pricing", p)} aria-current={p === pricing}>{p}</Link>
+        ))}
       </Dropdown>
       <div style={{ position: "relative" }}>
         <Icon name="search" width={12} style={{ position: "absolute", left: 10, top: 8, color: "var(--muted)" }} />

@@ -33,6 +33,12 @@ export const siteSchema = z.object({
   tags: z.array(z.string().trim().min(1).max(40)).max(30),
   new_category: z.string().trim().max(60).optional().default(""),
   library_ids: z.array(z.string().uuid()).max(20).optional().default([]),
+  pricing: z.enum(["", "Free", "Freemium", "Paid", "One-time", "Subscription", "Open source"]).optional().default(""),
+  features: z.array(z.string().trim().min(1).max(140)).max(20).optional().default([]),
+  social: z.record(z.enum(["x", "linkedin", "instagram", "github", "youtube", "dribbble", "behance"]),
+    z.string().trim().max(500).refine((v) => v === "" || /^https?:\/\//i.test(v), "Links must start with https://"))
+    .optional().default({}).transform((o) => Object.fromEntries(Object.entries(o).filter(([, v]) => v))),
+  gallery_pages: z.array(z.string().trim().url("Each page must be a full URL").refine((v) => /^https?:\/\//i.test(v))).max(8).optional().default([]),
 });
 export type SiteInput = z.infer<typeof siteSchema>;
 
