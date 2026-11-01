@@ -20,11 +20,16 @@ export function Thumb({ site, eager }: { site: SiteFull; eager?: boolean }) {
 export function SiteCard({ site, eager }: { site: SiteFull; eager?: boolean }) {
   return (
     <Link href={`/references/${site.slug}`} className="card" data-reveal>
-      <Thumb site={site} eager={eager} />
+      <div className="thumb-wrap">
+        <Thumb site={site} eager={eager} />
+        {site.description || site.short_description ? (
+          <div className="thumb-hover"><p>{site.description || site.short_description}</p></div>
+        ) : null}
+      </div>
       <div className="card-meta">
         <strong>{site.name}</strong>
         {site.featured && <Verified />}
-        {(site.short_description || site.category) && <span className="dot">·</span>}
+        {(site.short_description || site.category) && <span className="dot">•</span>}
         <span className="sub">{site.short_description || site.category?.name}</span>
       </div>
     </Link>
