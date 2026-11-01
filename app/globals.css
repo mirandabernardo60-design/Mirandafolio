@@ -633,3 +633,25 @@ button { font: inherit; color: inherit; cursor: pointer; }
 /* Keep the verified badge right after the name when the title wraps */
 .hero-info h2 { display: block; }
 .hero-info h2 .verified { display: inline-block; vertical-align: -2px; margin-left: 6px; }
+
+/* ===== Fit every phone/browser: never wider than the screen, no auto-zoom ===== */
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { max-width: 100%; overflow-x: hidden; }
+@supports (overflow: clip) { html, body { overflow-x: clip; } }
+.shell > div { min-width: 0; max-width: 100vw; }
+img, video, svg { max-width: 100%; }
+/* iOS zooms into inputs smaller than 16px: keep form fields at 16px on phones */
+@media (max-width: 860px) {
+  input, select, textarea { font-size: 16px !important; }
+  .m-brand { padding-top: env(safe-area-inset-top, 0px); height: calc(60px + env(safe-area-inset-top, 0px)); }
+  .topbar, .filterbar, .page, .m-brand { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+}
+/* Scale type down smoothly on narrow phones (iPhone SE … Pro Max) */
+@media (max-width: 430px) {
+  .hero-info h2 { font-size: clamp(20px, 6vw, 26px); }
+  .hero-info p { font-size: clamp(14px, 4vw, 16px); }
+  .top-tabs { gap: clamp(14px, 5vw, 28px); }
+  .top-tabs a { font-size: clamp(14px, 4.2vw, 17px); white-space: nowrap; }
+  .section-head h2 { font-size: clamp(18px, 5.4vw, 22px); }
+  .chip { font-size: 14px; }
+}
