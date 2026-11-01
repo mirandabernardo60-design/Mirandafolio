@@ -6,8 +6,8 @@ O GitHub guarda o código. O GitHub Pages só serve sites estáticos e não cons
 1. Cria conta em https://supabase.com → **New project**.
 2. **SQL Editor** → cola o conteúdo de `supabase/migrations/0001_init.sql` → **Run**.
 3. (Opcional) cola `supabase/seed.sql` → **Run** (cria categorias iniciais).
-4. **Authentication → Providers → Email**: muda o mínimo da password para 3 e desliga "Allow new users to sign up".
-5. **Authentication → Users → Add user**: email `123@gmail.com`, password `123`, marca "Auto confirm".
+4. **Authentication → Providers → Email**: deixa "Allow new users to sign up" ligado (os visitantes criam conta).
+5. **Authentication → Users → Add user**: email `123@gmail.com`, password `123456`, marca "Auto confirm".
 6. **SQL Editor**:
    ```sql
    insert into public.admins (user_id) select id from auth.users where email = '123@gmail.com';
@@ -33,12 +33,12 @@ O GitHub guarda o código. O GitHub Pages só serve sites estáticos e não cons
 
 ## 4. Usar
 - Site público: `https://o-teu-endereco.vercel.app`
-- Adicionar sites: botão **Add site** (ou `/admin`) → login `123@gmail.com` / `123` → cola o link.
+- Adicionar sites: botão **Add site** (ou `/admin`) → login `123@gmail.com` / `123456` → cola o link.
 
 ## Se o deploy falhar
 Este código ainda não foi compilado (o ambiente onde foi escrito não tinha acesso ao npm). Se o Vercel mostrar um erro no build, copia o texto do erro e cola-o ao Claude para ser corrigido.
 
-⚠️ A password `123` é muito fácil de adivinhar. Quando o site estiver público, muda-a no Supabase (Authentication → Users).
+⚠️ A password `123456` é muito fácil de adivinhar. Quando o site estiver público, muda-a no Supabase (Authentication → Users).
 
 
 ## Entrar com Google ou Apple (obrigatório para ver o site)
