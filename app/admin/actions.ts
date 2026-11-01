@@ -119,7 +119,7 @@ export async function saveSite(id: string | null, form: FormData): Promise<Resul
     parsed.error.issues.forEach((i) => { fields[String(i.path[0])] = i.message; });
     return { ok: false, error: "Please fix the highlighted fields.", fields };
   }
-  const { tags, new_category, ...input } = parsed.data;
+  const { tags, new_category, library_ids, ...input } = parsed.data;
 
   try {
     if (new_category) {
@@ -159,6 +159,11 @@ export async function saveSite(id: string | null, form: FormData): Promise<Resul
     if (error) throw error;
 
     await syncTags(db, data.id, tags);
+    await db.from("site_libraries").delete().eq("site_id", data.id);
+    if (library_ids.length) {
+      const { error: lErr } = await db.from("site_libraries").insert(library_ids.map((library_id) => ({ site_id: data.id, library_id })));
+      if (lErr) throw lErr;
+    }
 
     // Safe cleanup: remove the replaced upload only after the row points to the new one.
     if (previousPath && thumbnail_path !== undefined && previousPath !== thumbnail_path) {
@@ -367,4 +372,100 @@ async function uniqueSlugFor(db: DB, table: "articles", base: string, exceptId?:
     if (!data) return candidate;
   }
   return `${root}-${Date.now().toString(36)}`;
+}
+
+// ---------- Collections ----------
+const collectionSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(120),
+  description: z.string().trim().max(400).default(""),
+  published: z.boolean().default(true),
+});
+
+async function uniqueSlugIn(db: DB, table: "collections" | "libraries", base: string, exceptId?: string) {
+  const root = slugify(base);
+  for (let i = 0; i < 50; i++) {
+    const candidate = i === 0 ? root : `${root}-${i + 1}`;
+    let q = db.from(table).select("id").eq("slug", candidate);
+    if (exceptId) q = q.neq("id", exceptId);
+    const { data } = await q.maybeSingle();
+    if (!data) return candidate;
+  }
+  return `${root}-${Date.now().toString(36)}`;
+}
+
+export async function saveCollection(id: string | null, raw: unknown): Promise<Result<{ id: string; slug: string }>> {
+  const { supabase: db } = await requireAdmin();
+  const p = collectionSchema.safeParse(raw);
+  if (!p.success) return { ok: false, error: p.error.issues[0]?.message ?? "Invalid collection." };
+  const slug = await uniqueSlugIn(db, "collections", p.data.name, id ?? undefined);
+  const { data, error } = id
+    ? await db.from("collections").update({ ...p.data, slug }).eq("id", id).select("id, slug").single()
+    : await db.from("collections").insert({ ...p.data, slug }).select("id, slug").single();
+  if (error) return fail(error);
+  refreshPublic();
+  revalidatePath("/admin", "layout");
+  return { ok: true, data };
+}
+
+export async function deleteCollection(id: string): Promise<Result> {
+  const { supabase: db } = await requireAdmin();
+  const { error } = await db.from("collections").delete().eq("id", id);
+  if (error) return fail(error);
+  refreshPublic();
+  revalidatePath("/admin", "layout");
+  return { ok: true };
+}
+
+/** Add or remove one website from a collection (used by "Add to collection"). */
+export async function toggleCollectionSite(collectionId: string, siteId: string, add: boolean): Promise<Result> {
+  const { supabase: db } = await requireAdmin();
+  if (!z.string().uuid().safeParse(collectionId).success || !z.string().uuid().safeParse(siteId).success) return { ok: false, error: "Invalid ids." };
+  if (add) {
+    const { count } = await db.from("collection_sites").select("site_id", { count: "exact", head: true }).eq("collection_id", collectionId);
+    const { error } = await db.from("collection_sites").upsert({ collection_id: collectionId, site_id: siteId, position: count ?? 0 });
+    if (error) return fail(error);
+  } else {
+    const { error } = await db.from("collection_sites").delete().eq("collection_id", collectionId).eq("site_id", siteId);
+    if (error) return fail(error);
+  }
+  await db.from("collections").update({ updated_at: new Date().toISOString() }).eq("id", collectionId);
+  refreshPublic();
+  return { ok: true };
+}
+
+/** Create a collection and put the website in it, in one step. */
+export async function createCollectionWithSite(name: string, siteId: string): Promise<Result<{ id: string }>> {
+  const r = await saveCollection(null, { name, description: "", published: true });
+  if (!r.ok || !r.data) return r.ok ? { ok: false, error: "Could not create collection." } : r;
+  const t = await toggleCollectionSite(r.data.id, siteId, true);
+  return t.ok ? { ok: true, data: { id: r.data.id } } : t;
+}
+
+// ---------- Libraries ----------
+export async function saveLibrary(id: string | null, form: FormData): Promise<Result> {
+  const { supabase: db } = await requireAdmin();
+  const p = z.object({
+    name: z.string().trim().min(1).max(60),
+    icon_url: z.string().trim().max(2000).transform((v) => (v === "" ? null : v)).nullable()
+      .refine((v) => v === null || /^https?:\/\//.test(v), "Icon must be an http(s) URL"),
+    position: z.coerce.number().int().default(0),
+  }).safeParse({ name: form.get("name"), icon_url: form.get("icon_url") ?? "", position: form.get("position") || 0 });
+  if (!p.success) return { ok: false, error: p.error.issues[0]?.message ?? "Invalid library." };
+  const slug = await uniqueSlugIn(db, "libraries", p.data.name, id ?? undefined);
+  const { error } = id
+    ? await db.from("libraries").update({ ...p.data, slug }).eq("id", id)
+    : await db.from("libraries").insert({ ...p.data, slug });
+  if (error) return fail(error);
+  refreshPublic();
+  revalidatePath("/admin", "layout");
+  return { ok: true };
+}
+
+export async function deleteLibrary(id: string): Promise<Result> {
+  const { supabase: db } = await requireAdmin();
+  const { error } = await db.from("libraries").delete().eq("id", id);
+  if (error) return fail(error);
+  refreshPublic();
+  revalidatePath("/admin", "layout");
+  return { ok: true };
 }

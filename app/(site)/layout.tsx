@@ -3,21 +3,22 @@ import { Footer } from "@/components/public/Footer";
 import { Reveal } from "@/components/public/Reveal";
 import { SearchPalette } from "@/components/public/SearchPalette";
 import { Sidebar } from "@/components/public/Sidebar";
-import { getCategories, getTags, listSites } from "@/lib/queries";
+import { getCategories, getLibraries, getTags, listSites } from "@/lib/queries";
 import { hasSupabaseEnv } from "@/lib/supabase/server";
 
 export const revalidate = 60;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
-  const [categories, tags, featured, recent] = await Promise.all([
+  const [categories, tags, featured, recent, libraries] = await Promise.all([
     getCategories(), getTags(),
     listSites({ featured: true, sort: "custom", limit: 8 }),
     listSites({ sort: "latest", limit: 8 }),
+    getLibraries(),
   ]);
   const mini = (s: (typeof recent)[number]) => ({ slug: s.slug, name: s.name, short_description: s.short_description, favicon_url: s.favicon_url, category: s.category?.name ?? "" });
   return (
     <div className="shell">
-      <Sidebar categories={categories} tags={tags} />
+      <Sidebar categories={categories} tags={tags} libraries={libraries} />
       <div style={{ minWidth: 0 }}>
         {!hasSupabaseEnv() && (
           <div style={{ background: "#3a1d00", color: "#ffcf99", fontSize: 12, padding: "8px 16px" }}>

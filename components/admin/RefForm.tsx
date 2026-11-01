@@ -8,13 +8,14 @@ import { slugify, thumbnailSrc } from "@/lib/utils";
 import { toast } from "./Toast";
 
 type Props = {
-  site?: Site & { tags: string[] };
+  libraries?: { id: string; name: string }[];
+  site?: Site & { tags: string[]; library_ids?: string[] };
   categories: { id: string; name: string }[];
   allTags: string[];
 };
 
 /* eslint-disable @next/next/no-img-element */
-export function RefForm({ site, categories, allTags }: Props) {
+export function RefForm({ site, categories, allTags, libraries = [] }: Props) {
   const router = useRouter();
   const [pending, start] = useTransition();
   const [fetching, setFetching] = useState(false);
@@ -42,6 +43,7 @@ export function RefForm({ site, categories, allTags }: Props) {
     position: site?.position ?? 0,
     tags: site?.tags ?? ([] as string[]),
     new_category: "",
+    library_ids: site?.library_ids ?? ([] as string[]),
   });
   const set = <K extends keyof typeof f>(k: K, v: (typeof f)[K]) => setF((p) => ({ ...p, [k]: v }));
 
@@ -156,6 +158,21 @@ export function RefForm({ site, categories, allTags }: Props) {
             <label className="adm-label">Design style
               <input className="adm-input" name="design_style" placeholder="e.g. Minimal, Brutalist, 3D" value={f.design_style} onChange={(e) => set("design_style", e.target.value)} /></label>
           </div>
+          {libraries.length > 0 && (
+            <div className="adm-label">Libraries <span style={{ fontWeight: 400, color: "var(--dim)" }}>(what it’s built with: Framer, Webflow…)</span>
+              <div className="adm-chips">
+                {libraries.map((l) => {
+                  const on = f.library_ids.includes(l.id);
+                  return (
+                    <button type="button" key={l.id} className={`adm-chip adm-toggle-chip${on ? " on" : ""}`} aria-pressed={on}
+                      onClick={() => set("library_ids", on ? f.library_ids.filter((x) => x !== l.id) : [...f.library_ids, l.id])}>
+                      {on ? "✓ " : "+ "}{l.name}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
           <div className="adm-label">Tags
             <div className="adm-chips">
               {f.tags.map((t) => (

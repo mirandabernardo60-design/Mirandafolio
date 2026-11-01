@@ -18,6 +18,8 @@ export default async function DashLayout({ children }: { children: React.ReactNo
           <Link className="nav-item" href="/admin/references"><Icon name="layers" /> References</Link>
           <Link className="nav-item" href="/admin/references/new"><Icon name="plus" /> Add website</Link>
           <Link className="nav-item" href="/admin/articles"><Icon name="file" /> Articles</Link>
+          <Link className="nav-item" href="/admin/collections"><Icon name="folders" /> Collections</Link>
+          <Link className="nav-item" href="/admin/libraries"><Icon name="layers" /> Libraries</Link>
           <Link className="nav-item" href="/admin/categories"><Icon name="grid" /> Categories</Link>
           <Link className="nav-item" href="/admin/tags"><Icon name="tag" /> Tags</Link>
           <Link className="nav-item" href="/admin/media"><Icon name="camera" /> Media</Link>

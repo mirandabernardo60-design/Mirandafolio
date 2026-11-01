@@ -32,6 +32,7 @@ export const siteSchema = z.object({
   position: z.coerce.number().int().min(-100000).max(100000),
   tags: z.array(z.string().trim().min(1).max(40)).max(30),
   new_category: z.string().trim().max(60).optional().default(""),
+  library_ids: z.array(z.string().uuid()).max(20).optional().default([]),
 });
 export type SiteInput = z.infer<typeof siteSchema>;
 

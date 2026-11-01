@@ -49,6 +49,8 @@ export type ListParams = {
   q?: string;
   category?: string; // slug
   tag?: string; // slug
+  library?: string; // slug
+  collection?: string; // id
   style?: string;
   sort?: Sort;
   featured?: boolean;
@@ -63,6 +65,18 @@ export async function listSites(p: ListParams = {}): Promise<SiteFull[]> {
   if (p.q?.trim()) {
     const { data } = await db.rpc("search_sites", { q: p.q.trim() });
     ids = ((data ?? []) as Site[]).map((s) => s.id);
+    if (!ids.length) return [];
+  }
+  if (p.library) {
+    const { data } = await db.from("site_libraries").select("site_id, libraries!inner(slug)").eq("libraries.slug", p.library);
+    const libIds = (data ?? []).map((r: { site_id: string }) => r.site_id);
+    ids = ids ? ids.filter((i) => libIds.includes(i)) : libIds;
+    if (!ids.length) return [];
+  }
+  if (p.collection) {
+    const { data } = await db.from("collection_sites").select("site_id").eq("collection_id", p.collection);
+    const cIds = (data ?? []).map((r: { site_id: string }) => r.site_id);
+    ids = ids ? ids.filter((i) => cIds.includes(i)) : cIds;
     if (!ids.length) return [];
   }
   if (p.tag) {
@@ -117,4 +131,57 @@ export async function getStyles(): Promise<string[]> {
   if (!hasSupabaseEnv()) return [];
   const { data } = await createPublicClient().from("sites").select("design_style").eq("status", "published");
   return [...new Set((data ?? []).map((r: { design_style: string }) => r.design_style).filter(Boolean))].sort();
+}
+
+export type LibraryCount = { id: string; name: string; slug: string; icon_url: string | null; position: number; site_count: number };
+
+export const getLibraries = cache(async (): Promise<LibraryCount[]> => {
+  if (!hasSupabaseEnv()) return [];
+  const { data } = await createPublicClient().from("library_counts").select("*").order("position").order("name");
+  return (data ?? []) as LibraryCount[];
+});
+
+export type CollectionCard = {
+  id: string; name: string; slug: string; description: string; created_at: string; updated_at: string;
+  site_count: number; icons: { name: string; favicon_url: string | null }[];
+};
+
+export async function listCollections(opts: { limit?: number; sort?: "latest" | "name" | "size" } = {}): Promise<CollectionCard[]> {
+  if (!hasSupabaseEnv()) return [];
+  const { data } = await createPublicClient()
+    .from("collections")
+    .select("id, name, slug, description, created_at, updated_at, items:collection_sites(position, site:sites(name, favicon_url, status))")
+    .eq("published", true)
+    .order("updated_at", { ascending: false });
+  type R = { id: string; name: string; slug: string; description: string; created_at: string; updated_at: string;
+    items: { position: number; site: { name: string; favicon_url: string | null; status: string } | null }[] };
+  let rows = ((data ?? []) as R[]).map((c) => {
+    const live = (c.items ?? []).filter((i) => i.site && i.site.status === "published").sort((a, b) => a.position - b.position);
+    return { id: c.id, name: c.name, slug: c.slug, description: c.description, created_at: c.created_at, updated_at: c.updated_at,
+      site_count: live.length, icons: live.slice(0, 5).map((i) => ({ name: i.site!.name, favicon_url: i.site!.favicon_url })) };
+  });
+  if (opts.sort === "name") rows = rows.sort((a, b) => a.name.localeCompare(b.name));
+  if (opts.sort === "size") rows = rows.sort((a, b) => b.site_count - a.site_count);
+  return opts.limit ? rows.slice(0, opts.limit) : rows;
+}
+
+export async function getCollection(slug: string) {
+  if (!hasSupabaseEnv()) return null;
+  const { data } = await createPublicClient().from("collections").select("id, name, slug, description, updated_at").eq("slug", slug).eq("published", true).maybeSingle();
+  return data as { id: string; name: string; slug: string; description: string; updated_at: string } | null;
+}
+
+export async function getSiteExtras(siteId: string) {
+  if (!hasSupabaseEnv()) return { libraries: [], collections: [] };
+  const db = createPublicClient();
+  const [{ data: libs }, { data: cols }] = await Promise.all([
+    db.from("site_libraries").select("library:libraries(id, name, slug, icon_url)").eq("site_id", siteId),
+    db.from("collection_sites").select("collection:collections(id, name, slug, published)").eq("site_id", siteId),
+  ]);
+  type L = { id: string; name: string; slug: string; icon_url: string | null };
+  type C = { id: string; name: string; slug: string; published: boolean };
+  return {
+    libraries: ((libs ?? []) as unknown as { library: L | null }[]).map((r) => r.library).filter(Boolean) as L[],
+    collections: ((cols ?? []) as unknown as { collection: C | null }[]).map((r) => r.collection).filter((c): c is C => !!c && c.published),
+  };
 }

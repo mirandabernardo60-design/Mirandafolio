@@ -1,15 +1,18 @@
 "use client";
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { CategoryCount, Tag } from "@/lib/types";
+import type { LibraryCount } from "@/lib/queries";
 import { Icon } from "./Icon";
 import { Logo } from "./Logo";
 
-export function Sidebar({ categories, tags }: { categories: CategoryCount[]; tags: Tag[] }) {
+export function Sidebar({ categories, tags, libraries = [] }: { categories: CategoryCount[]; tags: Tag[]; libraries?: LibraryCount[] }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const [catsOpen, setCatsOpen] = useState(true);
+  const [libsOpen, setLibsOpen] = useState(true);
   const [tagsOpen, setTagsOpen] = useState(false);
 
   useEffect(() => setOpen(false), [pathname]);
@@ -35,6 +38,7 @@ export function Sidebar({ categories, tags }: { categories: CategoryCount[]; tag
           <Link className="nav-item" href="/" aria-current={cur("/")}><Icon name="compass" /> Explore</Link>
           <Link className="nav-item" href="/featured" aria-current={cur("/featured")}><Icon name="bolt" /> Featured</Link>
           <Link className="nav-item" href="/articles" aria-current={cur("/articles")}><Icon name="file" /> Articles</Link>
+          <Link className="nav-item" href="/collections" aria-current={cur("/collections")}><Icon name="folders" /> Collections</Link>
           <Link className="nav-item" href="/all" aria-current={cur("/all")}><Icon name="folders" /> All websites</Link>
           <div style={{ height: 10 }} />
 
@@ -52,6 +56,25 @@ export function Sidebar({ categories, tags }: { categories: CategoryCount[]; tag
             </div>
           </div>
 
+          {libraries.length > 0 && (
+            <>
+              <button className="nav-group" aria-expanded={libsOpen} onClick={() => setLibsOpen((v) => !v)}>
+                Libraries <Icon name="chevron" />
+              </button>
+              <div className="collapse" data-open={libsOpen}>
+                <div style={{ paddingTop: 4 }}>
+                  {libraries.map((l) => (
+                    <Link key={l.id} className="nav-item" href={`/library/${l.slug}`} aria-current={cur(`/library/${l.slug}`)}>
+                      {l.icon_url
+                        ? <img src={l.icon_url} alt="" width={16} height={16} style={{ borderRadius: 3, flex: "none" }} />
+                        : <span className="lib-dot" aria-hidden="true">{l.name.slice(0, 1)}</span>}
+                      {l.name} <span className="nav-count">{l.site_count}</span>
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
           <button className="nav-group" aria-expanded={catsOpen} onClick={() => setCatsOpen((v) => !v)}>
             Categories <Icon name="chevron" />
           </button>

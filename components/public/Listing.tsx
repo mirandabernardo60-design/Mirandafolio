@@ -4,6 +4,8 @@ import { Banner } from "./Banner";
 import { HeroCarousel } from "./HeroCarousel";
 import { ArticleCard } from "./ArticleCard";
 import { listArticles } from "@/lib/articles";
+import { CollectionCard } from "./CollectionCard";
+import { listCollections } from "@/lib/queries";
 import { MiniSite, SiteCard } from "./Cards";
 import { FilterBar } from "./FilterBar";
 import { Icon } from "./Icon";
@@ -14,20 +16,21 @@ export type SP = { q?: string; tag?: string; style?: string; sort?: string };
 
 /** Shared browsing page used by Explore, category, tag, featured and all pages. */
 export async function Listing({
-  title, sp, category, tag, featuredOnly, showHome,
+  title, sp, category, tag, library, featuredOnly, showHome,
 }: {
-  title: string; sp: SP; category?: string; tag?: string; featuredOnly?: boolean; showHome?: boolean;
+  title: string; sp: SP; category?: string; tag?: string; library?: string; featuredOnly?: boolean; showHome?: boolean;
 }) {
   const sort = (["latest", "oldest", "name", "custom"].includes(sp.sort ?? "") ? sp.sort : "latest") as Sort;
-  const filters = { q: sp.q, tag: tag ?? sp.tag, style: sp.style, category, sort, featured: featuredOnly };
+  const filters = { q: sp.q, tag: tag ?? sp.tag, style: sp.style, category, library, sort, featured: featuredOnly };
   const filtering = Boolean(sp.q || sp.tag || sp.style);
-  const articles = filtering || featuredOnly || tag ? [] : await listArticles({ category, limit: 9 });
+  const collections = showHome && !category && !filtering ? await listCollections({ sort: "size", limit: 9 }) : [];
+  const articles = filtering || featuredOnly || tag || library ? [] : await listArticles({ category, limit: 9 });
 
   const [categories, tags, styles, all, featured, recent] = await Promise.all([
     getCategories(), getTags(), getStyles(),
     listSites(filters),
-    filtering || featuredOnly ? Promise.resolve([]) : listSites({ category, tag, featured: true, sort: "custom", limit: 12 }),
-    filtering || featuredOnly ? Promise.resolve([]) : listSites({ category, tag, sort: "latest", limit: 12 }),
+    filtering || featuredOnly ? Promise.resolve([]) : listSites({ category, tag, library, featured: true, sort: "custom", limit: 12 }),
+    filtering || featuredOnly ? Promise.resolve([]) : listSites({ category, tag, library, sort: "latest", limit: 12 }),
   ]);
 
   return (
@@ -47,6 +50,12 @@ export async function Listing({
           </CarouselSection>
         )}
 
+        {collections.length > 0 && (
+          <CarouselSection title="Popular Collections" icon={<Icon name="folders" width={16} />} moreHref="/collections">
+            {collections.map((c) => <CollectionCard key={c.id} c={c} />)}
+          </CarouselSection>
+        )}
+
         {articles.length > 0 && (
           <CarouselSection
             title={`${category ? categories.find((c) => c.slug === category)?.name ?? "" : "Design"} Articles`.trim()}
@@ -58,7 +67,7 @@ export async function Listing({
 
         {recent.length > 0 && (
           <section className="section">
-            <div className="section-head"><h2>Recently Added</h2></div>
+            <div className="section-head"><h2>New Additions</h2></div>
             <div className="grid-mini">{recent.map((s) => <MiniSite key={s.id} site={s} />)}</div>
           </section>
         )}

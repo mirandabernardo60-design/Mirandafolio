@@ -5,7 +5,10 @@ import { CarouselSection } from "@/components/public/Carousel";
 import { Icon, Verified } from "@/components/public/Icon";
 import { Topbar } from "@/components/public/Topbar";
 import { CopyLink } from "@/components/public/CopyLink";
-import { getRelated, getSiteBySlug } from "@/lib/queries";
+import { getRelated, getSiteBySlug, getSiteExtras } from "@/lib/queries";
+import { AddToCollection } from "@/components/public/AddToCollection";
+import { getViewer } from "@/lib/viewer";
+import { createClient } from "@/lib/supabase/server";
 import { formatDate, hostname, thumbnailSrc } from "@/lib/utils";
 
 type P = { params: Promise<{ slug: string }> };
@@ -25,7 +28,18 @@ export async function generateMetadata({ params }: P) {
 export default async function ReferencePage({ params }: P) {
   const site = await getSiteBySlug((await params).slug);
   if (!site) notFound();
-  const related = await getRelated(site);
+  const [related, extras, viewer] = await Promise.all([getRelated(site), getSiteExtras(site.id), getViewer()]);
+  let adminCollections: { id: string; name: string }[] = [];
+  let memberOf: string[] = [];
+  if (viewer.isAdmin) {
+    const db = await createClient();
+    const [{ data: cols }, { data: mem }] = await Promise.all([
+      db.from("collections").select("id, name").order("name"),
+      db.from("collection_sites").select("collection_id").eq("site_id", site.id),
+    ]);
+    adminCollections = cols ?? [];
+    memberOf = (mem ?? []).map((m) => m.collection_id);
+  }
 
   return (
     <>
@@ -80,6 +94,18 @@ export default async function ReferencePage({ params }: P) {
                 <div><p className="eyebrow">Design style</p><p style={{ fontWeight: 500 }}>
                   <Link href={`/all?style=${encodeURIComponent(site.design_style)}`}>{site.design_style}</Link></p></div>
               )}
+              {extras.libraries.length > 0 && (
+                <div><p className="eyebrow">Built with</p>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+                    {extras.libraries.map((l) => <Link key={l.id} href={`/library/${l.slug}`} className="pill">{l.name}</Link>)}
+                  </div></div>
+              )}
+              {extras.collections.length > 0 && (
+                <div><p className="eyebrow">In collections</p>
+                  <div style={{ display: "grid", gap: 6 }}>
+                    {extras.collections.map((c) => <Link key={c.id} href={`/collections/${c.slug}`} style={{ fontWeight: 500 }}>{c.name}</Link>)}
+                  </div></div>
+              )}
               <div><p className="eyebrow">Website</p>
                 <a href={site.url} target="_blank" rel="noopener noreferrer" style={{ display: "flex", gap: 6, alignItems: "center", fontWeight: 500 }}>
                   <Icon name="globe" width={13} /> {hostname(site.url)}
@@ -99,6 +125,7 @@ export default async function ReferencePage({ params }: P) {
         </div>
 
         <aside className="aside">
+          {viewer.isAdmin && <AddToCollection siteId={site.id} collections={adminCollections} memberOf={memberOf} />}
           <CopyLink />
           <a className="row" href={site.url} target="_blank" rel="noopener noreferrer"><Icon name="external" width={14} /> Open website</a>
           {related.length > 0 && (

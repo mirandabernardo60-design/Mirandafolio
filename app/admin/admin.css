@@ -65,3 +65,5 @@
   .adm-table .hide-m { display: none; }
 }
 @media (max-width: 520px) { .adm-row2 { grid-template-columns: 1fr; } }
+.adm-toggle-chip { border: 1px solid var(--line-2); padding: 4px 10px; cursor: pointer; color: #ccc; }
+.adm-toggle-chip.on { background: #0d1a3a; border-color: #2b4fbf; color: #cfe0ff; }
