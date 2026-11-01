@@ -51,7 +51,7 @@ export async function memberSignUp(_: State, form: FormData): Promise<State> {
 
 /** Sign in / sign up with Google or Apple (Supabase OAuth). New users get an account automatically. */
 export async function oauthSignIn(form: FormData) {
-  const provider = form.get("provider") === "apple" ? "apple" : "google";
+  const provider = "google" as const;
   const h = await headers();
   const origin = process.env.NEXT_PUBLIC_SITE_URL || `https://${h.get("host")}`;
   const next = safeNext(form.get("next"));

@@ -1,5 +1,7 @@
+"use client";
 import Link from "next/link";
-import { oauthSignIn } from "@/app/auth-actions";
+import { useActionState, useState } from "react";
+import { memberSignIn, memberSignUp, oauthSignIn } from "@/app/auth-actions";
 import { Logo } from "./Logo";
 
 const GoogleIcon = () => (
@@ -10,13 +12,9 @@ const GoogleIcon = () => (
     <path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/>
   </svg>
 );
-const AppleIcon = () => (
-  <svg width="17" height="17" viewBox="0 0 24 24" aria-hidden="true">
-    <path fill="currentColor" d="M16.4 12.6c0-2.5 2-3.7 2.1-3.8-1.2-1.7-3-1.9-3.6-2-1.5-.2-3 .9-3.8.9-.8 0-2-.9-3.3-.9-1.7 0-3.3 1-4.1 2.5-1.8 3.1-.5 7.6 1.3 10.1.8 1.2 1.8 2.6 3.1 2.5 1.3-.1 1.7-.8 3.3-.8 1.5 0 1.9.8 3.3.8 1.4 0 2.2-1.2 3-2.4.9-1.4 1.3-2.7 1.3-2.8-.1 0-2.6-1-2.6-4.1zM14 5.2c.7-.8 1.1-1.9 1-3-1 0-2.1.6-2.8 1.4-.6.7-1.2 1.8-1 2.9 1.1.1 2.1-.5 2.8-1.3z"/>
-  </svg>
-);
-
 export function AuthForm({ mode, next, error }: { mode: "signin" | "signup"; next: string; error?: string }) {
+  const [state, action, pending] = useActionState(mode === "signin" ? memberSignIn : memberSignUp, null);
+  const [email, setEmail] = useState("");
   const q = next && next !== "/" ? `?next=${encodeURIComponent(next)}` : "";
   return (
     <main className="auth-wrap">
@@ -24,12 +22,29 @@ export function AuthForm({ mode, next, error }: { mode: "signin" | "signup"; nex
         <Logo />
         <h1>{mode === "signin" ? "Sign in to Miranda" : "Create your account"}</h1>
         <p className="auth-sub">A curated library of the best websites on the internet.</p>
-        <form action={oauthSignIn} className="auth-form">
+
+        {state?.ok && state.message ? (
+          <p className="auth-ok" role="status">{state.message}</p>
+        ) : (
+          <form action={action} className="auth-form">
+            <input type="hidden" name="next" value={next} />
+            <label>Email<input name="email" type="email" autoComplete="email" required value={email} onChange={(e) => setEmail(e.target.value)} /></label>
+            <label>Password<input name="password" type="password" minLength={6} required
+              autoComplete={mode === "signin" ? "current-password" : "new-password"} /></label>
+            {state && !state.ok && <p className="auth-err" role="alert">{state.error}</p>}
+            <button className="btn-pill auth-btn" disabled={pending}>
+              {pending ? "Please wait…" : mode === "signin" ? "Sign in" : "Create account"}
+            </button>
+          </form>
+        )}
+
+        <div className="auth-or"><span>or</span></div>
+        <form action={oauthSignIn}>
           <input type="hidden" name="next" value={next} />
-          <button className="auth-oauth" name="provider" value="google"><GoogleIcon /> Continue with Google</button>
-          <button className="auth-oauth" name="provider" value="apple"><AppleIcon /> Continue with Apple</button>
+          <button className="auth-oauth" name="provider" value="google" style={{ width: "100%" }}><GoogleIcon /> Continue with Google</button>
         </form>
-        {error && <p className="auth-err" role="alert" style={{ marginTop: 12 }}>Sign in didn’t complete. Please try again.</p>}
+        {error && <p className="auth-err" role="alert" style={{ marginTop: 12 }}>Google sign in didn’t complete. Please try again or use email.</p>}
+
         <p className="auth-switch">
           {mode === "signin"
             ? <>New here? <Link href={`/signup${q}`}>Create an account</Link></>

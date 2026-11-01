@@ -42,7 +42,7 @@ Este código ainda não foi compilado (o ambiente onde foi escrito não tinha ac
 
 
 ## Entrar com Google ou Apple (obrigatório para ver o site)
-- Os visitantes entram com **Continue with Google** ou **Continue with Apple**. A conta é criada automaticamente na primeira vez.
+- Os visitantes criam conta com **email e password** ou entram com **Continue with Google**.
 - Só o admin (`123@gmail.com`) entra em `/admin/login` com email e password, e só ele vê **Add site**.
 
 ### Supabase → Authentication → URL Configuration
@@ -56,9 +56,3 @@ Este código ainda não foi compilado (o ambiente onde foi escrito não tinha ac
 4. Copia o **Client ID** e o **Client secret**.
 5. Supabase → **Authentication → Sign In / Providers → Google** → ativa e cola os dois → Save.
 
-### Apple (precisa de conta Apple Developer, 99 USD/ano)
-1. https://developer.apple.com/account → **Certificates, Identifiers & Profiles**.
-2. Cria um **App ID** com "Sign in with Apple" e um **Services ID** (este é o Client ID). No Services ID, configura o domínio `tuwnnqmrgmxeaiyardqs.supabase.co` e o Return URL `https://tuwnnqmrgmxeaiyardqs.supabase.co/auth/v1/callback`.
-3. Cria uma **Key** com "Sign in with Apple" e descarrega o ficheiro `.p8`.
-4. Supabase → **Authentication → Sign In / Providers → Apple** → ativa, cola o Services ID e gera o secret com o Team ID, Key ID e o ficheiro .p8 (o Supabase explica no próprio ecrã) → Save.
-5. O secret da Apple expira a cada 6 meses: tens de o gerar outra vez.
