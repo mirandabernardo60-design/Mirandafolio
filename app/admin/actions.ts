@@ -23,9 +23,9 @@ function fail(e: unknown): { ok: false; error: string } {
 // ---------- Auth ----------
 export async function signIn(_: unknown, form: FormData): Promise<Result> {
   const parsed = z.object({ email: z.string().email(), password: z.string().min(1) }).safeParse({
-    email: form.get("email"), password: form.get("password"),
+    email: String(form.get("email") ?? "").trim().toLowerCase(), password: String(form.get("password") ?? ""),
   });
-  if (!parsed.success) return { ok: false, error: "Enter a valid email and password." };
+  if (!parsed.success) return { ok: false, error: !parsed.data && String(form.get("password") ?? "") === "" ? "Enter your password." : "Enter a valid email address (e.g. 123@gmail.com)." };
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) return { ok: false, error: "Invalid login credentials." };
