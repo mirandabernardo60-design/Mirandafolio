@@ -655,3 +655,19 @@ img, video, svg { max-width: 100%; }
   .section-head h2 { font-size: clamp(18px, 5.4vw, 22px); }
   .chip { font-size: 14px; }
 }
+
+/* Search on phones: clear the status bar / Dynamic Island and keep sections tight */
+@media (max-width: 720px) {
+  .sp { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .sp-search { padding: 14px 16px; gap: 10px; border-bottom: 1px solid #26262a; }
+  .sp-search input { font-size: 17px !important; }
+  .sp-body { grid-template-rows: auto minmax(0, 1fr); align-content: start; }
+  .sp-nav { align-self: start; padding: 10px 16px; gap: 6px; }
+  .sp-nav button { height: 34px; padding: 0 12px; border-radius: 99px; font-size: 14px; }
+  .sp-main { padding-top: 0; }
+  .sp-row { margin-bottom: 22px; }
+  .sp-row-head { margin: 6px 0 12px; }
+  .sp-card { width: 170px; min-height: 124px; padding: 16px; }
+  .sp-card strong { margin-top: 16px; }
+  .sp-track > .sp-iconlink .sp-appicon { width: 52px !important; height: 52px !important; }
+}
