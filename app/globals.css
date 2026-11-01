@@ -62,9 +62,9 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 .nav-group svg { width: 12px; height: 12px; color: var(--dim); transition: transform .25s var(--ease-out); }
 .nav-group[aria-expanded="true"] svg { transform: rotate(180deg); }
-.collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s var(--ease-out); }
-.collapse[data-open="true"] { grid-template-rows: 1fr; }
-.collapse > div { overflow: hidden; }
+.nav-collapse { display: grid; grid-template-rows: 0fr; transition: grid-template-rows .35s var(--ease-out); }
+.nav-collapse[data-open="true"] { grid-template-rows: 1fr; }
+.nav-collapse > div { overflow: hidden; }
 .sidebar-foot { border-top: 1px solid var(--line); padding: 6px 0; }
 
 /* ---------- Header ---------- */

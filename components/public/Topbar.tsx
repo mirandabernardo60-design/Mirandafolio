@@ -1,20 +1,11 @@
 import Link from "next/link";
 import { memberSignOut } from "@/app/auth-actions";
-import { createClient, hasSupabaseEnv } from "@/lib/supabase/server";
+import { getViewer } from "@/lib/viewer";
 import { Icon } from "./Icon";
 import { MenuButton } from "./MenuButton";
 
-async function viewer() {
-  if (!hasSupabaseEnv()) return { signedIn: false, isAdmin: false };
-  const supabase = await createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return { signedIn: false, isAdmin: false };
-  const { data } = await supabase.rpc("is_admin");
-  return { signedIn: true, isAdmin: Boolean(data) };
-}
-
 export async function Topbar({ title, crumbs }: { title?: string; crumbs?: { href?: string; label: string }[] }) {
-  const { signedIn, isAdmin } = await viewer();
+  const { signedIn, isAdmin } = await getViewer();
   return (
     <header className="topbar">
       <MenuButton />

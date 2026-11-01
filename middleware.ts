@@ -20,7 +20,16 @@ export async function middleware(request: NextRequest) {
     },
   );
 
-  const { data: { user } } = await supabase.auth.getUser();
+  // Prefer local JWT verification (no network round trip); fall back to getUser.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const auth = supabase.auth as any;
+  let user: { id: string } | null = null;
+  if (typeof auth.getClaims === "function") {
+    const { data, error } = await auth.getClaims();
+    user = !error && data?.claims?.sub ? { id: data.claims.sub } : null;
+  } else {
+    user = (await supabase.auth.getUser()).data.user;
+  }
   const path = request.nextUrl.pathname;
   const redirectTo = (pathname: string, next: string) => {
     const url = request.nextUrl.clone();

@@ -45,7 +45,7 @@ export function Sidebar({ categories, tags, libraries = [] }: { categories: Cate
           <button className="nav-group" aria-expanded={tagsOpen} onClick={() => setTagsOpen((v) => !v)}>
             Tags <Icon name="chevron" />
           </button>
-          <div className="collapse" data-open={tagsOpen}>
+          <div className="nav-collapse" data-open={tagsOpen}>
             <div>
               {tags.map((t) => (
                 <Link key={t.id} className="nav-item" href={`/tag/${t.slug}`} aria-current={cur(`/tag/${t.slug}`)}>
@@ -61,7 +61,7 @@ export function Sidebar({ categories, tags, libraries = [] }: { categories: Cate
               <button className="nav-group" aria-expanded={libsOpen} onClick={() => setLibsOpen((v) => !v)}>
                 Libraries <Icon name="chevron" />
               </button>
-              <div className="collapse" data-open={libsOpen}>
+              <div className="nav-collapse" data-open={libsOpen}>
                 <div style={{ paddingTop: 4 }}>
                   {libraries.map((l) => (
                     <Link key={l.id} className="nav-item" href={`/library/${l.slug}`} aria-current={cur(`/library/${l.slug}`)}>
@@ -78,7 +78,7 @@ export function Sidebar({ categories, tags, libraries = [] }: { categories: Cate
           <button className="nav-group" aria-expanded={catsOpen} onClick={() => setCatsOpen((v) => !v)}>
             Categories <Icon name="chevron" />
           </button>
-          <div className="collapse" data-open={catsOpen}>
+          <div className="nav-collapse" data-open={catsOpen}>
             <div style={{ paddingTop: 4 }}>
               {categories.map((c) => (
                 <Link key={c.id} className="nav-item" href={`/category/${c.slug}`} aria-current={cur(`/category/${c.slug}`)}>
