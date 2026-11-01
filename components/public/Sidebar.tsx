@@ -28,19 +28,29 @@ export function Sidebar({ categories, tags, libraries = [] }: { categories: Cate
     <>
       {open && <div onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, zIndex: 39, background: "rgba(0,0,0,.5)" }} />}
       <aside className="sidebar" data-open={open}>
-        <Link href="/" className="logo" aria-label="Miranda home"><Logo /></Link>
+        <div className="sb-head">
+          <Link href="/" className="logo" aria-label="Miranda home"><Logo /></Link>
+          <span className="sb-head-actions">
+            <button className="icon-btn m-icon" aria-label="Search" onClick={() => { setOpen(false); window.dispatchEvent(new Event("miranda:open-search")); }}>
+              <Icon name="search" width={21} />
+            </button>
+            <button className="icon-btn m-icon" aria-label="Close menu" onClick={() => setOpen(false)}><Icon name="x" width={22} /></button>
+          </span>
+        </div>
         <div className="sidebar-scroll">
-          <button className="nav-item" style={{ width: "calc(100% - 8px)", background: "none", border: 0 }}
+          <button className="nav-item sb-search" style={{ width: "calc(100% - 8px)", background: "none", border: 0 }}
             onClick={() => window.dispatchEvent(new Event("miranda:open-search"))}>
             <Icon name="search" /> Search <span className="kbd">⌘ K</span>
           </button>
           <div style={{ height: 6 }} />
+          <div className="sb-main">
           <Link className="nav-item" href="/" aria-current={cur("/")}><Icon name="compass" /> Explore</Link>
           <Link className="nav-item" href="/featured" aria-current={cur("/featured")}><Icon name="bolt" /> Featured</Link>
           <Link className="nav-item" href="/articles" aria-current={cur("/articles")}><Icon name="file" /> Articles</Link>
           <Link className="nav-item" href="/collections" aria-current={cur("/collections")}><Icon name="folders" /> Collections</Link>
           <Link className="nav-item" href="/saved" aria-current={cur("/saved")}><Icon name="bookmark" /> Saved</Link>
           <Link className="nav-item" href="/all" aria-current={cur("/all")}><Icon name="folders" /> All websites</Link>
+          </div>
           <div style={{ height: 10 }} />
 
           <button className="nav-group" aria-expanded={tagsOpen} onClick={() => setTagsOpen((v) => !v)}>
