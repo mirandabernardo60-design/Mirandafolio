@@ -55,10 +55,13 @@ export default async function ReferencePage({ params }: P) {
       <div className="detail">
         <div className="detail-main">
           <div className="detail-hero" data-reveal>
-            <span className="mini-icon" style={{ width: 26, height: 26, borderRadius: 7 }}>
+            <span className="mini-icon detail-icon">
               {site.favicon_url ? <img src={site.favicon_url} alt="" /> : site.name[0]}
             </span>
-            <h1>{site.name} {site.featured && <Verified style={{ width: 16, height: 16 }} />}</h1>
+            <div className="detail-title">
+              <h1>{site.name} {site.featured && <Verified style={{ width: 18, height: 18 }} />}</h1>
+              {(site.design_style || site.category?.name) && <p>{site.design_style || site.category?.name}</p>}
+            </div>
             <a className="btn-blue" href={site.url} target="_blank" rel="noopener noreferrer" style={{ marginLeft: "auto" }}>
               Visit Website <Icon name="external" width={13} />
             </a>
