@@ -424,3 +424,38 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .sp-search input { font-size: 17px; }
   .sp-main { padding: 4px 16px 24px; }
 }
+
+/* Articles (cards measured from toolfolio.com "Design Articles") */
+.carousel:has(> .acard) { grid-auto-columns: calc((100% - 32px) / 3); }
+.grid-articles { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.acard { display: flex; flex-direction: column; min-height: 262px; padding: 20px; border-radius: 16px; background: #18181b; transition: background-color .2s ease; }
+.acard:hover { background: #1f1f23; }
+.acard-icons { display: flex; align-items: center; gap: 6px; min-height: 32px; }
+.acard-icon { width: 32px; height: 32px; border-radius: 7px; overflow: hidden; background: #fff; color: #000; display: grid; place-items: center; font-weight: 700; font-size: 14px; flex: none; }
+.acard-icon img { width: 100%; height: 100%; object-fit: cover; }
+.acard-icon--doc { background: #2a2a2f; color: #fff; }
+.acard-more { height: 32px; min-width: 32px; padding: 0 6px; border-radius: 7px; background: #2a2a2f; color: #a6a6a6; font-size: 11px; display: grid; place-items: center; }
+.acard h3 { margin: 18px 0 0; font-size: 18px; font-weight: 600; line-height: 1.3; letter-spacing: -0.2px; color: #fff; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.acard p { margin: 10px 0 0; font-size: 14px; line-height: 1.65; color: #8c8c94; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.acard-foot { margin-top: auto; padding-top: 24px; display: flex; justify-content: space-between; font-size: 14px; color: #6f6f77; }
+.article { max-width: 720px; margin: 0 auto; padding: 48px 20px 24px; }
+.article h1 { margin: 16px 0 0; font-size: clamp(28px, 4vw, 40px); line-height: 1.15; letter-spacing: -0.03em; font-weight: 600; text-wrap: balance; }
+.article-lead { margin: 16px 0 0; font-size: 18px; line-height: 1.55; color: #b4b4bb; }
+.article-meta { margin: 16px 0 0; font-size: 13px; color: #77777f; }
+.article-sites { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 8px; }
+.article-sites .pill { gap: 6px; align-items: center; }
+.md { margin-top: 32px; font-size: 16.5px; line-height: 1.75; color: #dcdce0; }
+.md > * + * { margin-top: 1.1em; }
+.md h2 { margin-top: 2em; font-size: 24px; line-height: 1.3; font-weight: 600; letter-spacing: -0.02em; color: #fff; }
+.md h3 { margin-top: 1.6em; font-size: 19px; font-weight: 600; color: #fff; }
+.md a { color: #8fb0ff; text-decoration: underline; text-underline-offset: 3px; }
+.md ul, .md ol { padding-left: 1.3em; }
+.md li + li { margin-top: .4em; }
+.md blockquote { margin-left: 0; padding-left: 16px; border-left: 2px solid #3a3a40; color: #b4b4bb; }
+.md code { font-size: .9em; padding: 2px 6px; border-radius: 5px; background: #222226; }
+.md hr { border: 0; border-top: 1px solid var(--line); margin: 2em 0; }
+.md figure { margin: 1.6em 0; }
+.md figure img { width: 100%; border-radius: 10px; }
+.md figcaption { margin-top: 8px; font-size: 13px; color: #77777f; text-align: center; }
+@media (max-width: 1024px) { .grid-articles { grid-template-columns: repeat(2, minmax(0, 1fr)); } .carousel:has(> .acard) { grid-auto-columns: calc((100% - 16px) / 2); } }
+@media (max-width: 640px) { .grid-articles { grid-template-columns: minmax(0, 1fr); } .carousel:has(> .acard) { grid-auto-columns: 86%; } .acard h3 { font-size: 17px; } }

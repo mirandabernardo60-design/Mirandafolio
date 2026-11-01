@@ -2,6 +2,8 @@ import { Suspense } from "react";
 import { CarouselSection } from "./Carousel";
 import { Banner } from "./Banner";
 import { HeroCarousel } from "./HeroCarousel";
+import { ArticleCard } from "./ArticleCard";
+import { listArticles } from "@/lib/articles";
 import { MiniSite, SiteCard } from "./Cards";
 import { FilterBar } from "./FilterBar";
 import { Icon } from "./Icon";
@@ -19,6 +21,7 @@ export async function Listing({
   const sort = (["latest", "oldest", "name", "custom"].includes(sp.sort ?? "") ? sp.sort : "latest") as Sort;
   const filters = { q: sp.q, tag: tag ?? sp.tag, style: sp.style, category, sort, featured: featuredOnly };
   const filtering = Boolean(sp.q || sp.tag || sp.style);
+  const articles = filtering || featuredOnly || tag ? [] : await listArticles({ category, limit: 9 });
 
   const [categories, tags, styles, all, featured, recent] = await Promise.all([
     getCategories(), getTags(), getStyles(),
@@ -41,6 +44,15 @@ export async function Listing({
         {featured.length > 0 && (
           <CarouselSection title="Featured Websites" icon={<Icon name="bolt" width={16} style={{ color: "#5b8cff", fill: "#5b8cff" }} />}>
             {featured.map((s, i) => <SiteCard key={s.id} site={s} eager={i < 4} />)}
+          </CarouselSection>
+        )}
+
+        {articles.length > 0 && (
+          <CarouselSection
+            title={`${category ? categories.find((c) => c.slug === category)?.name ?? "" : "Design"} Articles`.trim()}
+            icon={<Icon name="file" width={16} />}
+            moreHref="/articles">
+            {articles.map((a) => <ArticleCard key={a.id} a={a} />)}
           </CarouselSection>
         )}
 

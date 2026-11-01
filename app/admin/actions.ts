@@ -303,3 +303,68 @@ export async function deleteUnusedMedia(paths: string[]): Promise<Result<{ remov
   revalidatePath("/admin/media");
   return { ok: true, data: { removed: safe.length } };
 }
+
+// ---------- Articles ----------
+const articleSchema = z.object({
+  title: z.string().trim().min(1, "Title is required").max(160),
+  slug: z.string().trim().max(80).regex(/^([a-z0-9]+(-[a-z0-9]+)*)?$/, "Lowercase letters, numbers and dashes only"),
+  excerpt: z.string().trim().max(300),
+  body: z.string().max(100000),
+  category_id: z.string().transform((v) => (v === "" ? null : v)).nullable()
+    .refine((v) => v === null || z.string().uuid().safeParse(v).success, "Invalid category"),
+  status: z.enum(["draft", "published"]),
+  site_ids: z.array(z.string().uuid()).max(30),
+});
+
+export async function saveArticle(id: string | null, raw: unknown): Promise<Result<{ id: string; slug: string }>> {
+  const { supabase: db } = await requireAdmin();
+  const p = articleSchema.safeParse(raw);
+  if (!p.success) {
+    const fields: Record<string, string> = {};
+    p.error.issues.forEach((i) => { fields[String(i.path[0])] = i.message; });
+    return { ok: false, error: "Please fix the highlighted fields.", fields };
+  }
+  const { site_ids, ...input } = p.data;
+  try {
+    const slug = await uniqueSlugFor(db, "articles", input.slug || input.title, id ?? undefined);
+    let published_at: string | null | undefined;
+    if (input.status === "published") {
+      const prev = id ? (await db.from("articles").select("published_at").eq("id", id).single()).data : null;
+      published_at = prev?.published_at ?? new Date().toISOString();
+    }
+    const row = { ...input, slug, ...(published_at !== undefined ? { published_at } : {}) };
+    const { data, error } = id
+      ? await db.from("articles").update(row).eq("id", id).select("id, slug").single()
+      : await db.from("articles").insert(row).select("id, slug").single();
+    if (error) throw error;
+    await db.from("article_sites").delete().eq("article_id", data.id);
+    if (site_ids.length) {
+      const { error: e2 } = await db.from("article_sites").insert(site_ids.map((site_id, position) => ({ article_id: data.id, site_id, position })));
+      if (e2) throw e2;
+    }
+    refreshPublic();
+    return { ok: true, data };
+  } catch (e) {
+    return fail(e);
+  }
+}
+
+export async function deleteArticle(id: string): Promise<Result> {
+  const { supabase: db } = await requireAdmin();
+  const { error } = await db.from("articles").delete().eq("id", id);
+  if (error) return fail(error);
+  refreshPublic();
+  return { ok: true };
+}
+
+async function uniqueSlugFor(db: DB, table: "articles", base: string, exceptId?: string) {
+  const root = slugify(base);
+  for (let i = 0; i < 50; i++) {
+    const candidate = i === 0 ? root : `${root}-${i + 1}`;
+    let q = db.from(table).select("id").eq("slug", candidate);
+    if (exceptId) q = q.neq("id", exceptId);
+    const { data } = await q.maybeSingle();
+    if (!data) return candidate;
+  }
+  return `${root}-${Date.now().toString(36)}`;
+}

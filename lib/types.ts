@@ -21,3 +21,10 @@ export type Site = {
   updated_at: string;
 };
 export type SiteFull = Site & { category: Category | null; tags: Tag[] };
+export type ArticleSite = { id: string; name: string; slug: string; favicon_url: string | null };
+export type Article = {
+  id: string; title: string; slug: string; excerpt: string; body: string;
+  category_id: string | null; status: "draft" | "published";
+  published_at: string | null; created_at: string; updated_at: string;
+};
+export type ArticleFull = Article & { category: Category | null; sites: ArticleSite[] };

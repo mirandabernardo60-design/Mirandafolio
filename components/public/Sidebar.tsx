@@ -34,6 +34,7 @@ export function Sidebar({ categories, tags }: { categories: CategoryCount[]; tag
           <div style={{ height: 6 }} />
           <Link className="nav-item" href="/" aria-current={cur("/")}><Icon name="compass" /> Explore</Link>
           <Link className="nav-item" href="/featured" aria-current={cur("/featured")}><Icon name="bolt" /> Featured</Link>
+          <Link className="nav-item" href="/articles" aria-current={cur("/articles")}><Icon name="file" /> Articles</Link>
           <Link className="nav-item" href="/all" aria-current={cur("/all")}><Icon name="folders" /> All websites</Link>
           <div style={{ height: 10 }} />
 
