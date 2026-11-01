@@ -56,3 +56,23 @@ Este código ainda não foi compilado (o ambiente onde foi escrito não tinha ac
 4. Copia o **Client ID** e o **Client secret**.
 5. Supabase → **Authentication → Sign In / Providers → Google** → ativa e cola os dois → Save.
 
+
+
+## Atualizações da base de dados (correr por ordem, uma vez)
+No Supabase → SQL Editor, cola o conteúdo de cada ficheiro e carrega em Run:
+1. `supabase/SETUP_ALL.sql` — tabelas base, categorias iniciais e admin
+2. `supabase/migrations/0002_articles.sql` — artigos
+3. `supabase/migrations/0003_collections_libraries.sql` — coleções e libraries
+4. `supabase/migrations/0004_site_details.sql` — pricing, features, links sociais, galeria
+5. `supabase/migrations/0005_bookmarks_reports.sql` — Saved (bookmarks) e Report a problem
+
+Todos podem ser corridos de novo sem estragar dados.
+
+## O que o admin pode fazer (em /admin)
+- **References**: adicionar sites (o screenshot e os dados aparecem sozinhos ao colar o link), editar, duplicar, publicar, destacar, reordenar, apagar, ações em lote
+- **Articles**: escrever artigos (Markdown simples), ligar sites e categoria, publicar
+- **Collections**: criar, editar, esconder, apagar; juntar/tirar sites (ou usar "Add to collection" na página de cada site)
+- **Libraries**: Framer, Webflow, Shopify… (aparecem na sidebar)
+- **Categories / Tags**: criar, mudar o nome, apagar
+- **Reports**: avisos dos visitantes ("Report a problem")
+- **Media**: ver e limpar imagens não usadas
