@@ -27,7 +27,7 @@ export async function Listing({
   const articles = filtering || featuredOnly || tag || library ? [] : await listArticles({ category, limit: 9 });
 
   const [categories, tags, styles, all, featured, recent] = await Promise.all([
-    getCategories(), getTags(), getStyles(),
+    getCategories().catch(() => []), getTags().catch(() => []), getStyles(),
     listSites(filters),
     filtering || featuredOnly ? Promise.resolve([]) : listSites({ category, tag, library, featured: true, sort: "custom", limit: 12 }),
     filtering || featuredOnly ? Promise.resolve([]) : listSites({ category, tag, library, sort: "latest", limit: 12 }),

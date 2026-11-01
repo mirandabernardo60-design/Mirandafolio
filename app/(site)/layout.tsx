@@ -10,7 +10,7 @@ export const revalidate = 60;
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const [categories, tags, featured, recent, libraries] = await Promise.all([
-    getCategories(), getTags(),
+    getCategories().catch(() => []), getTags().catch(() => []),
     listSites({ featured: true, sort: "custom", limit: 8 }),
     listSites({ sort: "latest", limit: 8 }),
     getLibraries(),

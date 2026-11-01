@@ -1,6 +1,6 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { requireAdmin } from "@/lib/auth";
@@ -12,6 +12,7 @@ import { slugify } from "@/lib/utils";
 export type Result<T = undefined> = { ok: true; data?: T } | { ok: false; error: string; fields?: Record<string, string> };
 
 function refreshPublic() {
+  revalidateTag("public");
   revalidatePath("/", "layout");
 }
 

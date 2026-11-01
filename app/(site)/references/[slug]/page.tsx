@@ -64,11 +64,11 @@ export default async function ReferencePage({ params }: P) {
 
           <div className="detail-shot" data-reveal>
             <div className="gallery">
-              <a href={site.url} target="_blank" rel="noopener noreferrer" className="gallery-item card" aria-label={`Open ${site.name}`}>
+              <a href={site.url} target="_blank" rel="noopener noreferrer" className="gallery-item" aria-label={`Open ${site.name}`}>
                 <Thumb site={site} eager />
               </a>
               {(site.gallery_pages ?? []).map((u) => (
-                <a key={u} href={u} target="_blank" rel="noopener noreferrer" className="gallery-item card" aria-label={`Open ${u}`}>
+                <a key={u} href={u} target="_blank" rel="noopener noreferrer" className="gallery-item" aria-label={`Open ${u}`}>
                   <div className="thumb"><img src={pageShot(u)} alt={`${site.name} — ${hostname(u)}${new URL(u).pathname}`} loading="lazy" /></div>
                 </a>
               ))}

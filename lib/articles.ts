@@ -1,4 +1,5 @@
 import "server-only";
+import { unstable_cache } from "next/cache";
 import { createPublicClient, hasSupabaseEnv } from "./supabase/server";
 import type { ArticleFull, ArticleSite } from "./types";
 
@@ -14,7 +15,7 @@ export function readMinutes(body: string) {
   return Math.max(1, Math.round(body.trim().split(/\s+/).filter(Boolean).length / 220));
 }
 
-export async function listArticles(opts: { category?: string; limit?: number } = {}): Promise<ArticleFull[]> {
+async function _listArticles(opts: { category?: string; limit?: number } = {}): Promise<ArticleFull[]> {
   if (!hasSupabaseEnv()) return [];
   const db = createPublicClient();
   let q = db.from("articles").select(SELECT).eq("status", "published").order("published_at", { ascending: false });
@@ -28,9 +29,16 @@ export async function listArticles(opts: { category?: string; limit?: number } =
   return ((data ?? []) as Row[]).map(shape);
 }
 
-export async function getArticle(slug: string): Promise<ArticleFull | null> {
+async function _getArticle(slug: string): Promise<ArticleFull | null> {
   if (!hasSupabaseEnv()) return null;
   const { data } = await createPublicClient().from("articles").select(SELECT)
     .eq("slug", slug).eq("status", "published").maybeSingle();
   return data ? shape(data as Row) : null;
 }
+
+// ---- Cached public reads (cleared by revalidateTag("public") whenever the admin changes content) ----
+function cached<A extends unknown[], R>(fn: (...a: A) => Promise<R>, key: string) {
+  return (...a: A) => unstable_cache(() => fn(...a), [key, JSON.stringify(a)], { tags: ["public"], revalidate: 300 })();
+}
+export const listArticles = cached(_listArticles, "listArticles");
+export const getArticle = cached(_getArticle, "getArticle");
