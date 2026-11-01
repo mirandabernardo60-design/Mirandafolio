@@ -39,8 +39,10 @@ function Slide({ site, active }: { site: SiteFull; active: boolean }) {
   const src = thumbnailSrc(site);
   const tint = useTint(src);
   return (
-    <Link href={`/references/${site.slug}`} className="hero-slide" aria-hidden={!active} tabIndex={active ? 0 : -1}>
-      <div className="hero-info" style={{ background: `linear-gradient(135deg, ${tint} 0%, color-mix(in srgb, ${tint} 70%, #000) 100%)` }}>
+    <Link href={`/references/${site.slug}`} className="hero-slide" aria-hidden={!active} tabIndex={active ? 0 : -1} draggable={false}
+      style={{ background: `linear-gradient(160deg, ${tint} 0%, color-mix(in srgb, ${tint} 60%, #000) 100%)` }}
+      onClick={(e) => { if ((e.currentTarget.closest(".hero") as HTMLElement | null)?.dataset.dragged === "1") e.preventDefault(); }}>
+      <div className="hero-info">
         <span className="hero-icon">
           {site.favicon_url ? <img src={site.favicon_url} alt="" /> : site.name.slice(0, 1)}
         </span>
@@ -49,7 +51,7 @@ function Slide({ site, active }: { site: SiteFull; active: boolean }) {
         <span className="hero-tag">{site.category?.name ?? site.design_style}</span>
       </div>
       <div className="hero-shot">
-        {src ? <img src={src} alt={`${site.name} preview`} /> : <span className="fallback">{site.name.slice(0, 1)}</span>}
+        {src ? <img src={src} alt={`${site.name} preview`} draggable={false} /> : <span className="fallback">{site.name.slice(0, 1)}</span>}
       </div>
     </Link>
   );
@@ -57,6 +59,9 @@ function Slide({ site, active }: { site: SiteFull; active: boolean }) {
 
 export function HeroCarousel({ sites }: { sites: SiteFull[] }) {
   const [i, setI] = useState(0);
+  const [drag, setDrag] = useState(0); // px offset while the finger is down
+  const start = useRef<{ x: number; y: number; t: number; locked: null | "x" | "y" } | null>(null);
+  const root = useRef<HTMLElement>(null);
   const paused = useRef(false);
   const n = sites.length;
   const go = useCallback((to: number) => setI(((to % n) + n) % n), [n]);
@@ -69,9 +74,40 @@ export function HeroCarousel({ sites }: { sites: SiteFull[] }) {
 
   if (!n) return null;
   return (
-    <section className="hero" data-reveal aria-roledescription="carousel"
-      onMouseEnter={() => (paused.current = true)} onMouseLeave={() => (paused.current = false)}>
-      <div className="hero-track" style={{ transform: `translateX(-${i * 100}%)` }}>
+    <section ref={root} className="hero" data-reveal aria-roledescription="carousel"
+      onMouseEnter={() => (paused.current = true)} onMouseLeave={() => (paused.current = false)}
+      onPointerDown={(e) => {
+        if (n < 2 || (e.pointerType === "mouse" && e.button !== 0)) return;
+        start.current = { x: e.clientX, y: e.clientY, t: Date.now(), locked: null };
+        paused.current = true;
+        if (root.current) root.current.dataset.dragged = "0";
+      }}
+      onPointerMove={(e) => {
+        const s0 = start.current;
+        if (!s0) return;
+        const dx = e.clientX - s0.x, dy = e.clientY - s0.y;
+        if (!s0.locked && Math.hypot(dx, dy) > 6) s0.locked = Math.abs(dx) > Math.abs(dy) ? "x" : "y";
+        if (s0.locked !== "x") return;
+        if (root.current) root.current.dataset.dragged = "1";
+        // resist at the ends
+        const atEdge = (i === 0 && dx > 0) || (i === n - 1 && dx < 0);
+        setDrag(atEdge ? dx / 3 : dx);
+      }}
+      onPointerUp={(e) => {
+        const s0 = start.current;
+        start.current = null;
+        paused.current = false;
+        if (!s0 || s0.locked !== "x") { setDrag(0); return; }
+        const dx = e.clientX - s0.x;
+        const w = root.current?.clientWidth ?? 1;
+        const fast = Math.abs(dx) / Math.max(1, Date.now() - s0.t) > 0.4;
+        if ((Math.abs(dx) > w * 0.18 || fast) && dx < 0) go(Math.min(i + 1, n - 1));
+        else if ((Math.abs(dx) > w * 0.18 || fast) && dx > 0) go(Math.max(i - 1, 0));
+        setDrag(0);
+      }}
+      onPointerCancel={() => { start.current = null; paused.current = false; setDrag(0); }}>
+      <div className="hero-track" data-dragging={drag !== 0}
+        style={{ transform: `translateX(calc(-${i * 100}% + ${drag}px))` }}>
         {sites.map((s, k) => <Slide key={s.id} site={s} active={k === i} />)}
       </div>
       {n > 1 && (
