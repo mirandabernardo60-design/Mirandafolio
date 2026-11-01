@@ -147,8 +147,7 @@ export async function fetchMetadata(rawUrl: string): Promise<FetchedMeta> {
   return meta;
 }
 
-const DEFAULT_SCREENSHOT_SERVICE =
-  "https://api.microlink.io/?url={url}&screenshot=true&meta=false&viewport.width=1440&viewport.height=900&waitUntil=networkidle2&waitForTimeout=3000";
+const DEFAULT_SCREENSHOT_SERVICE = "https://s.wordpress.com/mshots/v1/{url}?w=1440&h=900";
 
 /**
  * Screenshot of the live site via a screenshot service (Microlink free tier by default,
@@ -164,7 +163,16 @@ export async function screenshotUrl(target: string) {
     const res = await fetch(url, { redirect: "manual", signal: AbortSignal.timeout(25000) });
     if (res.status >= 300 && res.status < 400) return res.headers.get("location");
     if (!res.ok) return null;
-    if ((res.headers.get("content-type") ?? "").startsWith("image/")) return url;
+    if ((res.headers.get("content-type") ?? "").startsWith("image/")) {
+      // mshots serves a small "generating" placeholder first; wait until the real image is ready.
+      for (let i = 0; i < 8; i++) {
+        const probe = await fetch(url, { signal: AbortSignal.timeout(15000) });
+        const len = Number(probe.headers.get("content-length") ?? (await probe.arrayBuffer()).byteLength);
+        if (len > 12000) return url;
+        await new Promise((r) => setTimeout(r, 3000));
+      }
+      return null;
+    }
     const json = (await res.json().catch(() => null)) as { data?: { screenshot?: { url?: string } } } | null;
     return json?.data?.screenshot?.url ?? null;
   } catch {
