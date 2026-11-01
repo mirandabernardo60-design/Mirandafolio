@@ -511,3 +511,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .social-link { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 6px; color: #cfcfcf; transition: color .15s, background-color .15s; }
 .social-link:hover { color: #fff; background: var(--nav-active); }
 @media (max-width: 860px) { .gallery { grid-auto-columns: 88%; } .features { grid-template-columns: 1fr; } }
+/* Name never shrinks under the description; the description truncates instead */
+.card-meta .card-name { flex: none; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.card-meta .verified, .card-meta .dot { flex: none; }
+.card-meta .sub { flex: 1 1 auto; min-width: 0; }
