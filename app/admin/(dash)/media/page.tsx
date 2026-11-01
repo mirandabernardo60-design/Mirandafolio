@@ -5,7 +5,7 @@ export default async function Media() {
   const { supabase: db } = await requireAdmin();
   // Uploads are stored as <slug>/<uuid>.<ext>: list folders, then files.
   const { data: folders } = await db.storage.from("thumbnails").list("", { limit: 1000 });
-  const files: { path: string; size: number; created_at: string }[] = [];
+  const files: { path: string; size: number; created_at: string | null }[] = [];
   for (const folder of folders ?? []) {
     if (folder.id) { files.push({ path: folder.name, size: folder.metadata?.size ?? 0, created_at: folder.created_at }); continue; }
     const { data } = await db.storage.from("thumbnails").list(folder.name, { limit: 1000 });

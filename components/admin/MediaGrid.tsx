@@ -7,7 +7,7 @@ import { toast } from "./Toast";
 
 /* eslint-disable @next/next/no-img-element */
 export function MediaGrid({ files, usage, base }: {
-  files: { path: string; size: number; created_at: string }[];
+  files: { path: string; size: number; created_at: string | null }[];
   usage: Record<string, { id: string; name: string }>;
   base: string;
 }) {
