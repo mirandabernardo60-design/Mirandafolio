@@ -58,5 +58,5 @@ export async function middleware(request: NextRequest) {
 
 // Run on every page except static files and images.
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|manifest.webmanifest|apple-icon.png|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)$).*)"],
 };
