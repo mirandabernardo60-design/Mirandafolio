@@ -7,6 +7,8 @@ import { Topbar } from "@/components/public/Topbar";
 import { CopyLink } from "@/components/public/CopyLink";
 import { getRelated, getSiteBySlug, getSiteExtras } from "@/lib/queries";
 import { AddToCollection } from "@/components/public/AddToCollection";
+import { BookmarkButton } from "@/components/public/Bookmarks";
+import { ReportProblem } from "@/components/public/ReportProblem";
 import { getViewer } from "@/lib/viewer";
 import { createClient } from "@/lib/supabase/server";
 import { formatDate, hostname, pageShot, thumbnailSrc } from "@/lib/utils";
@@ -153,7 +155,9 @@ export default async function ReferencePage({ params }: P) {
 
         <aside className="aside">
           {viewer.isAdmin && <AddToCollection siteId={site.id} collections={adminCollections} memberOf={memberOf} />}
+          <BookmarkButton siteId={site.id} name={site.name} variant="row" />
           <CopyLink />
+          <ReportProblem siteId={site.id} siteName={site.name} />
           <a className="row" href={site.url} target="_blank" rel="noopener noreferrer"><Icon name="external" width={14} /> Open website</a>
           {related.length > 0 && (
             <>

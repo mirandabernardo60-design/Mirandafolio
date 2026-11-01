@@ -39,6 +39,7 @@ export function Sidebar({ categories, tags, libraries = [] }: { categories: Cate
           <Link className="nav-item" href="/featured" aria-current={cur("/featured")}><Icon name="bolt" /> Featured</Link>
           <Link className="nav-item" href="/articles" aria-current={cur("/articles")}><Icon name="file" /> Articles</Link>
           <Link className="nav-item" href="/collections" aria-current={cur("/collections")}><Icon name="folders" /> Collections</Link>
+          <Link className="nav-item" href="/saved" aria-current={cur("/saved")}><Icon name="bookmark" /> Saved</Link>
           <Link className="nav-item" href="/all" aria-current={cur("/all")}><Icon name="folders" /> All websites</Link>
           <div style={{ height: 10 }} />
 

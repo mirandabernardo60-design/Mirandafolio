@@ -470,3 +470,21 @@ export async function deleteLibrary(id: string): Promise<Result> {
   revalidatePath("/admin", "layout");
   return { ok: true };
 }
+
+// ---------- Reports ----------
+export async function setReportStatus(id: string, status: "open" | "resolved"): Promise<Result> {
+  const { supabase: db } = await requireAdmin();
+  if (!z.string().uuid().safeParse(id).success) return { ok: false, error: "Invalid report." };
+  const { error } = await db.from("reports").update({ status }).eq("id", id);
+  if (error) return fail(error);
+  revalidatePath("/admin/reports");
+  return { ok: true };
+}
+
+export async function deleteReport(id: string): Promise<Result> {
+  const { supabase: db } = await requireAdmin();
+  const { error } = await db.from("reports").delete().eq("id", id);
+  if (error) return fail(error);
+  revalidatePath("/admin/reports");
+  return { ok: true };
+}

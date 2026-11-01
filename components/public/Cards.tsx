@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { SiteFull } from "@/lib/types";
 import { thumbnailSrc } from "@/lib/utils";
 import { Icon, Verified } from "./Icon";
+import { BookmarkButton } from "./Bookmarks";
 
 /* eslint-disable @next/next/no-img-element */
 export function Thumb({ site, eager }: { site: SiteFull; eager?: boolean }) {
@@ -38,6 +39,7 @@ export function SiteCard({ site, eager }: { site: SiteFull; eager?: boolean }) {
         {site.featured && <Verified />}
         {(site.short_description || site.category) && <span className="dot">•</span>}
         <span className="sub">{site.short_description || site.category?.name}</span>
+        <BookmarkButton siteId={site.id} name={site.name} />
         <a className="card-ext" href={site.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${site.name} in a new tab`}>
           <Icon name="external" width={16} />
         </a>

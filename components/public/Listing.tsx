@@ -16,13 +16,13 @@ export type SP = { q?: string; tag?: string; style?: string; pricing?: string; s
 
 /** Shared browsing page used by Explore, category, tag, featured and all pages. */
 export async function Listing({
-  title, sp, category, tag, library, featuredOnly, showHome,
+  title, sp, category, tag, library, featuredOnly, showHome, latestOnly,
 }: {
-  title: string; sp: SP; category?: string; tag?: string; library?: string; featuredOnly?: boolean; showHome?: boolean;
+  title: string; sp: SP; category?: string; tag?: string; library?: string; featuredOnly?: boolean; showHome?: boolean; latestOnly?: boolean;
 }) {
   const sort = (["latest", "oldest", "name", "custom"].includes(sp.sort ?? "") ? sp.sort : "latest") as Sort;
   const filters = { q: sp.q, tag: tag ?? sp.tag, style: sp.style, pricing: sp.pricing, category, library, sort, featured: featuredOnly };
-  const filtering = Boolean(sp.q || sp.tag || sp.style || sp.pricing);
+  const filtering = Boolean(sp.q || sp.tag || sp.style || sp.pricing || latestOnly);
   const collections = showHome && !category && !filtering ? await listCollections({ sort: "size", limit: 9 }) : [];
   const articles = filtering || featuredOnly || tag || library ? [] : await listArticles({ category, limit: 9 });
 
@@ -35,7 +35,7 @@ export async function Listing({
 
   return (
     <>
-      <Topbar title={title} />
+      <Topbar title={title} tabs={showHome && !category || latestOnly ? [{ href: "/", label: "Explore", active: !latestOnly }, { href: "/latest", label: "Latest Additions", active: !!latestOnly }] : undefined} />
       <Suspense>
         <FilterBar categories={categories} tags={tags} styles={styles} count={all.length} lockCategory={!!category} />
       </Suspense>
@@ -74,7 +74,7 @@ export async function Listing({
 
         <section className="section">
           <div className="section-head">
-            <h2>{filtering ? `Results${sp.q ? ` for “${sp.q}”` : ""}` : featuredOnly ? "Featured" : "All Websites"}</h2>
+            <h2>{latestOnly ? "Latest Additions" : filtering ? `Results${sp.q ? ` for “${sp.q}”` : ""}` : featuredOnly ? "Featured" : "All Websites"}</h2>
           </div>
           {all.length ? (
             <div className="grid-cards">{all.map((s) => <SiteCard key={s.id} site={s} />)}</div>

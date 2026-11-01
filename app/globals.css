@@ -515,3 +515,35 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .card-meta .card-name { flex: none; max-width: 70%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .card-meta .verified, .card-meta .dot { flex: none; }
 .card-meta .sub { flex: 1 1 auto; min-width: 0; }
+
+/* Explore | Latest Additions tabs (toolfolio.com) */
+.top-tabs { display: flex; align-self: stretch; gap: 24px; }
+.top-tabs a { display: flex; align-items: center; font-size: 13px; color: var(--muted); border-bottom: 1px solid transparent; margin-bottom: -1px; transition: color .15s; }
+.top-tabs a:hover { color: #fff; }
+.top-tabs a[aria-current="page"] { color: #fff; border-bottom-color: #fff; }
+
+/* Bookmarks */
+.bm-btn { margin-left: auto; }
+.bm-btn + .card-ext { margin-left: 0; }
+.bm-btn[data-on="true"] { opacity: 1; transform: none; color: #fff; }
+.bm-row { background: none; border: 0; width: 100%; text-align: left; }
+.bm-row[aria-pressed="true"] { color: #fff; }
+.bm-toast { position: fixed; z-index: 200; right: 20px; bottom: 20px; padding: 10px 14px; border-radius: 10px; background: #fff; color: #000; font-size: 13px; font-weight: 500; animation: menu-in .2s var(--ease-out); }
+
+/* Report a problem */
+.rp-backdrop { position: fixed; inset: 0; z-index: 120; display: grid; place-items: center; padding: 16px; background: rgba(0,0,0,.55); backdrop-filter: blur(8px); animation: fade .15s ease; }
+.rp { width: min(460px, 100%); padding: 22px; border-radius: 16px; background: #141416; border: 1px solid var(--line-2); box-shadow: 0 30px 80px rgba(0,0,0,.6); animation: sp-in .25s cubic-bezier(.22,1,.36,1); }
+.rp-head { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 14px; }
+.rp-head h2 { margin: 0; font-size: 17px; font-weight: 600; line-height: 1.35; flex: 1; }
+.rp-reasons { border: 0; padding: 0; margin: 0; display: grid; gap: 4px; }
+.rp-reasons legend { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.rp-reasons label { display: flex; gap: 10px; align-items: center; padding: 9px 10px; border-radius: 9px; font-size: 14px; cursor: pointer; }
+.rp-reasons label:hover { background: var(--nav-active); }
+.rp-reasons input { accent-color: var(--blue); }
+.rp-note { display: grid; gap: 6px; margin-top: 14px; font-size: 12px; color: var(--muted); }
+.rp-note textarea { background: #0b0b0b; border: 1px solid var(--line-2); border-radius: 9px; color: #fff; font: inherit; font-size: 14px; padding: 10px; resize: vertical; outline: none; }
+.rp-note textarea:focus { border-color: #4b6fff; }
+.rp-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.rp-actions .btn-pill:disabled { opacity: .45; }
+.rp-err { color: #ff8d8d; font-size: 13px; margin: 10px 0 0; }
+.rp-ok { background: #0d2a17; color: #8ff0b5; border-radius: 9px; padding: 12px; font-size: 14px; margin: 0 0 14px; }
