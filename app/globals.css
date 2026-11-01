@@ -671,3 +671,10 @@ img, video, svg { max-width: 100%; }
   .sp-card strong { margin-top: 16px; }
   .sp-track > .sp-iconlink .sp-appicon { width: 52px !important; height: 52px !important; }
 }
+
+/* Phone menu (sidebar drawer): clear the status bar / Dynamic Island and the home indicator */
+@media (max-width: 860px) {
+  .sidebar { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); padding-left: env(safe-area-inset-left, 0px); height: 100dvh; }
+  .sidebar .logo { height: 60px; padding: 0 16px; }
+  .sidebar .logo-word { font-size: 22px; }
+}
