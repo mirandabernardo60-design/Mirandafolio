@@ -630,3 +630,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .detail-title p { margin: 4px 0 0; font-size: 15px; color: var(--muted); }
 .detail-hero .btn-blue { padding: 11px 22px; font-size: 14px; }
 @media (max-width: 860px) { .detail-icon { width: 48px; height: 48px; } .detail-title h1 { font-size: 24px; } }
+/* Keep the verified badge right after the name when the title wraps */
+.hero-info h2 { display: block; }
+.hero-info h2 .verified { display: inline-block; vertical-align: -2px; margin-left: 6px; }
