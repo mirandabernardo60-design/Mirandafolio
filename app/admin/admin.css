@@ -77,7 +77,9 @@
     overflow: visible;
   }
   .adm-side .logo { height: 52px; padding-left: 4px; }
-  .adm-side > form { justify-self: end; }
+  .adm-side > form { justify-self: end; grid-row: 1; grid-column: 2; }
+  .adm-side .logo { grid-row: 1; grid-column: 1; }
+  .adm-side nav { grid-row: 2; }
   .adm-side > form .nav-item { width: auto !important; font-size: 13px; }
   .adm-side nav { grid-column: 1 / -1; display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; margin: 0 -12px; padding: 0 12px 10px; }
   .adm-side nav::-webkit-scrollbar { display: none; }
