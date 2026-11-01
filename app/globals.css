@@ -750,3 +750,15 @@ img, video, svg { max-width: 100%; }
   .sp-card { width: 236px; min-height: 140px; border-radius: 16px; }
   .sp-results, .sp-grid, .sp-list, .sp-main > .sp-chips { padding-right: 16px; }
 }
+
+/* Phone filter menus: open as a bottom sheet so the sideways-scrolling filter bar can't clip them */
+@media (max-width: 860px) {
+  .filterbar .menu {
+    position: fixed; top: auto; left: max(12px, env(safe-area-inset-left, 0px)); right: max(12px, env(safe-area-inset-right, 0px));
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px)); min-width: 0; max-height: min(60vh, 440px);
+    padding: 8px; border-radius: 16px; z-index: 300; box-shadow: 0 -10px 60px rgba(0,0,0,.7), 0 0 0 100vmax rgba(0,0,0,.45);
+    transform-origin: bottom center; animation: sheet-in .22s cubic-bezier(.22,1,.36,1);
+  }
+  .filterbar .menu a, .filterbar .menu button { font-size: 16px; padding: 12px 12px; border-radius: 10px; }
+}
+@keyframes sheet-in { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: none; } }
