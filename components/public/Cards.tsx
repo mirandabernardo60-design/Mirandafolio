@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { SiteFull } from "@/lib/types";
 import { thumbnailSrc } from "@/lib/utils";
-import { Verified } from "./Icon";
+import { Icon, Verified } from "./Icon";
 
 /* eslint-disable @next/next/no-img-element */
 export function Thumb({ site, eager }: { site: SiteFull; eager?: boolean }) {
@@ -18,21 +18,31 @@ export function Thumb({ site, eager }: { site: SiteFull; eager?: boolean }) {
 }
 
 export function SiteCard({ site, eager }: { site: SiteFull; eager?: boolean }) {
+  const blurb = site.description || site.short_description;
+  const label = site.design_style || site.category?.name;
   return (
-    <Link href={`/references/${site.slug}`} className="card" data-reveal>
-      <div className="thumb-wrap">
-        <Thumb site={site} eager={eager} />
-        {site.description || site.short_description ? (
-          <div className="thumb-hover"><p>{site.description || site.short_description}</p></div>
-        ) : null}
-      </div>
+    <div className="card" data-reveal>
+      <Link href={`/references/${site.slug}`} className="card-link" aria-label={site.name}>
+        <div className="thumb-wrap">
+          <Thumb site={site} eager={eager} />
+          <div className="thumb-hover">
+            {label && <span className="th-label">{label}</span>}
+            <Icon name="eye" width={20} className="th-eye" />
+            {blurb && <p>{blurb}</p>}
+            {site.favicon_url && <img className="th-icon" src={site.favicon_url} alt="" loading="lazy" />}
+          </div>
+        </div>
+      </Link>
       <div className="card-meta">
-        <strong>{site.name}</strong>
+        <Link href={`/references/${site.slug}`} className="card-name"><strong>{site.name}</strong></Link>
         {site.featured && <Verified />}
         {(site.short_description || site.category) && <span className="dot">•</span>}
         <span className="sub">{site.short_description || site.category?.name}</span>
+        <a className="card-ext" href={site.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${site.name} in a new tab`}>
+          <Icon name="external" width={16} />
+        </a>
       </div>
-    </Link>
+    </div>
   );
 }
 

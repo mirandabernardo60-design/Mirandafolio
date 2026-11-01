@@ -23,6 +23,7 @@ const paths: Record<string, string> = {
   megaphone: "m3 11 18-8v18L3 13v-2Zm8 2.6V20a2 2 0 0 1-4 0v-5.5",
   bookmark: "M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2Z",
   external: "M7 17 17 7M8 7h9v9",
+  eye: "M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Zm10 3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z",
   bolt: "M13 2 3 14h9l-1 8 10-12h-9l1-8Z",
   menu: "M4 6h16M4 12h16M4 18h16",
   x: "M18 6 6 18M6 6l12 12",
