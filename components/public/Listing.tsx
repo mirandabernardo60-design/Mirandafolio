@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import { CarouselSection } from "./Carousel";
 import { Banner } from "./Banner";
+import { HeroCarousel } from "./HeroCarousel";
 import { MiniSite, SiteCard } from "./Cards";
 import { FilterBar } from "./FilterBar";
 import { Icon } from "./Icon";
@@ -33,7 +34,9 @@ export async function Listing({
         <FilterBar categories={categories} tags={tags} styles={styles} count={all.length} lockCategory={!!category} />
       </Suspense>
       <div className="page">
-        {showHome && !filtering && <Banner />}
+        {showHome && !filtering && (featured.length || recent.length
+          ? <HeroCarousel sites={(featured.length ? featured : recent).slice(0, 5)} />
+          : <Banner />)}
 
         {featured.length > 0 && (
           <CarouselSection title="Featured Websites" icon={<Icon name="bolt" width={16} style={{ color: "#5b8cff", fill: "#5b8cff" }} />}>
