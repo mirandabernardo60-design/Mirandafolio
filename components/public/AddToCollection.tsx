@@ -44,7 +44,7 @@ export function AddToCollection({ siteId, collections, memberOf }: { siteId: str
 
   return (
     <div ref={ref} style={{ position: "relative" }}>
-      <button className="row" style={{ background: "none", border: 0, width: "100%", padding: "6px 0" }} onClick={() => setOpen((o) => !o)} aria-expanded={open}>
+      <button className="row" onClick={() => setOpen((o) => !o)} aria-expanded={open}>
         <Icon name="bookmark" width={14} /> Add to collection {inSet.size > 0 && <span className="nav-count" style={{ marginLeft: "auto" }}>{inSet.size}</span>}
       </button>
       {open && (

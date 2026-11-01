@@ -164,7 +164,7 @@ export default async function ReferencePage({ params }: P) {
               <p className="eyebrow" style={{ marginTop: 22 }}>Similar websites</p>
               {related.slice(0, 8).map((s) => (
                 <Link key={s.id} className="row" href={`/references/${s.slug}`}>
-                  {s.favicon_url ? <img src={s.favicon_url} alt="" /> : <span className="ph" />} {s.name}
+                  {s.favicon_url ? <img src={s.favicon_url} alt="" /> : <span className="ph" />}<span>{s.name}</span>
                   {s.featured && <Verified />}
                 </Link>
               ))}

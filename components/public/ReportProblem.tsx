@@ -25,7 +25,7 @@ export function ReportProblem({ siteId, siteName }: { siteId: string; siteName: 
 
   return (
     <>
-      <button className="row" style={{ background: "none", border: 0, width: "100%" }} onClick={() => setOpen(true)}>
+      <button className="row" onClick={() => setOpen(true)}>
         <Icon name="flag" width={14} /> Report a problem
       </button>
       {open && (
