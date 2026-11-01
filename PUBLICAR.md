@@ -39,3 +39,12 @@ O GitHub guarda o código. O GitHub Pages só serve sites estáticos e não cons
 Este código ainda não foi compilado (o ambiente onde foi escrito não tinha acesso ao npm). Se o Vercel mostrar um erro no build, copia o texto do erro e cola-o ao Claude para ser corrigido.
 
 ⚠️ A password `123` é muito fácil de adivinhar. Quando o site estiver público, muda-a no Supabase (Authentication → Users).
+
+
+## Contas de visitantes (obrigatório entrar para ver o site)
+- Qualquer pessoa tem de criar conta (**Sign up**) ou entrar (**Sign in**) para ver o site.
+- Só o admin (`123@gmail.com`) vê o botão **Add site** e entra em `/admin`.
+- No Supabase → **Authentication → Sign In / Providers → Email**:
+  - **"Allow new users to sign up"** tem de estar **ligado**, senão ninguém se consegue registar.
+  - **"Confirm email"**: ligado = cada pessoa recebe um email para confirmar a conta antes de entrar; desligado = entram logo após o registo.
+- No Supabase → **Authentication → URL Configuration**: *Site URL* = o endereço do site no Vercel, e em *Redirect URLs* adiciona `https://O-TEU-SITE.vercel.app/auth/callback`.

@@ -277,3 +277,18 @@ button { font: inherit; color: inherit; cursor: pointer; }
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
   .js [data-reveal] { opacity: 1; transform: none; }
 }
+
+/* Member sign in / sign up */
+.auth-wrap { min-height: 100dvh; display: grid; place-items: center; padding: 24px 16px; background: radial-gradient(60% 40% at 50% 100%, rgba(22,101,245,.25), transparent 70%), var(--bg); }
+.auth-card { width: min(380px, 100%); background: var(--surface); border: 1px solid var(--line); border-radius: 14px; padding: 28px; }
+.auth-card h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; margin: 18px 0 4px; }
+.auth-sub { color: var(--muted); font-size: 13px; margin: 0 0 20px; }
+.auth-form { display: grid; gap: 14px; }
+.auth-form label { display: grid; gap: 6px; font-size: 12px; color: #bbb; font-weight: 500; }
+.auth-form input { background: #0b0b0b; border: 1px solid var(--line-2); color: #fff; border-radius: 8px; font: inherit; font-size: 14px; padding: 10px 12px; outline: none; }
+.auth-form input:focus { border-color: #4b6fff; box-shadow: 0 0 0 3px rgba(22,101,245,.2); }
+.auth-btn { border: 0; height: 40px; font-size: 14px; }
+.auth-err { color: #ff8d8d; font-size: 12.5px; margin: 0; }
+.auth-ok { background: #0d2a17; color: #8ff0b5; border-radius: 8px; padding: 12px; font-size: 13px; }
+.auth-switch { margin: 18px 0 0; font-size: 13px; color: var(--muted); text-align: center; }
+.auth-switch a { color: #fff; text-decoration: underline; text-underline-offset: 3px; }

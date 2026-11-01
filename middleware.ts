@@ -22,15 +22,32 @@ export async function middleware(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser();
   const path = request.nextUrl.pathname;
-  const isAdminArea = path.startsWith("/admin") && !path.startsWith("/admin/login");
-  if (isAdminArea && !user) {
+  const redirectTo = (pathname: string, next: string) => {
     const url = request.nextUrl.clone();
-    url.pathname = "/admin/login";
-    url.search = `?next=${encodeURIComponent(path)}`;
+    url.pathname = pathname;
+    url.search = `?next=${encodeURIComponent(next)}`;
+    return NextResponse.redirect(url);
+  };
+
+  // Admin area: admin login page; is_admin is enforced again in every admin page/action.
+  if (path.startsWith("/admin")) {
+    if (!user && !path.startsWith("/admin/login")) return redirectTo("/admin/login", path);
+    return response;
+  }
+
+  // Everyone must have an account to see the site.
+  const isAuthPage = path === "/login" || path === "/signup" || path.startsWith("/auth/");
+  if (!user && !isAuthPage) return redirectTo("/login", path + request.nextUrl.search);
+  if (user && (path === "/login" || path === "/signup")) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    url.search = "";
     return NextResponse.redirect(url);
   }
-  // Fine-grained authorization (is_admin) is enforced in every admin page/action via requireAdmin().
   return response;
 }
 
-export const config = { matcher: ["/admin/:path*", "/api/admin/:path*"] };
+// Run on every page except static files and images.
+export const config = {
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|icon.svg|.*\\.(?:png|jpg|jpeg|gif|webp|avif|svg|ico)$).*)"],
+};
