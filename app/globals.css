@@ -236,7 +236,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 
 /* Reveal animation initial state (GSAP sets final). No-JS fallback keeps content visible. */
-.js [data-reveal] { opacity: 0; transform: translateY(14px); }
 
 .empty { padding: 60px 0; text-align: center; color: var(--muted); font-size: 13px; }
 
@@ -275,7 +274,6 @@ button { font: inherit; color: inherit; cursor: pointer; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
-  .js [data-reveal] { opacity: 1; transform: none; }
 }
 
 /* Member sign in / sign up */
@@ -618,3 +616,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .sidebar { width: 86vw; }
 }
 .topbar > .icon-btn.m-icon:first-child { display: none; }
+
+/* Scroll reveal (see components/public/Reveal.tsx) — only below-the-fold elements get .rv */
+.rv { opacity: 0; transform: translateY(14px); transition: opacity .7s cubic-bezier(.22,1,.36,1), transform .7s cubic-bezier(.22,1,.36,1); transition-delay: calc(var(--rv-i, 0) * 60ms); }
+.rv.rv-in { opacity: 1; transform: none; }
+@media (prefers-reduced-motion: reduce) { .rv { opacity: 1; transform: none; transition: none; } }

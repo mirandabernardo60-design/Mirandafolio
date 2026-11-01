@@ -37,7 +37,7 @@ export function SiteCard({ site, eager }: { site: SiteFull; eager?: boolean }) {
       <div className="card-meta">
         <Link href={`/references/${site.slug}`} className="card-name"><strong>{site.name}</strong></Link>
         {site.featured && <Verified />}
-        {(site.short_description || site.category) && <span className="dot">•</span>}
+        {(site.short_description || site.category?.name) && <span className="dot">•</span>}
         <span className="sub">{site.short_description || site.category?.name}</span>
         <BookmarkButton siteId={site.id} name={site.name} />
         <a className="card-ext" href={site.url} target="_blank" rel="noopener noreferrer" aria-label={`Open ${site.name} in a new tab`}>
