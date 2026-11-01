@@ -49,6 +49,21 @@ export async function memberSignUp(_: State, form: FormData): Promise<State> {
   return { ok: true, message: "Account created. Check your email and click the link to confirm, then sign in." };
 }
 
+/** Sign in / sign up with Google or Apple (Supabase OAuth). New users get an account automatically. */
+export async function oauthSignIn(form: FormData) {
+  const provider = form.get("provider") === "apple" ? "apple" : "google";
+  const h = await headers();
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || `https://${h.get("host")}`;
+  const next = safeNext(form.get("next"));
+  const supabase = await createClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: `${origin}/auth/callback?next=${encodeURIComponent(next)}` },
+  });
+  if (error || !data.url) redirect(`/login?error=${encodeURIComponent(provider)}`);
+  redirect(data.url);
+}
+
 export async function memberSignOut() {
   const supabase = await createClient();
   await supabase.auth.signOut();

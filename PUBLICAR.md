@@ -41,10 +41,24 @@ Este código ainda não foi compilado (o ambiente onde foi escrito não tinha ac
 ⚠️ A password `123` é muito fácil de adivinhar. Quando o site estiver público, muda-a no Supabase (Authentication → Users).
 
 
-## Contas de visitantes (obrigatório entrar para ver o site)
-- Qualquer pessoa tem de criar conta (**Sign up**) ou entrar (**Sign in**) para ver o site.
-- Só o admin (`123@gmail.com`) vê o botão **Add site** e entra em `/admin`.
-- No Supabase → **Authentication → Sign In / Providers → Email**:
-  - **"Allow new users to sign up"** tem de estar **ligado**, senão ninguém se consegue registar.
-  - **"Confirm email"**: ligado = cada pessoa recebe um email para confirmar a conta antes de entrar; desligado = entram logo após o registo.
-- No Supabase → **Authentication → URL Configuration**: *Site URL* = o endereço do site no Vercel, e em *Redirect URLs* adiciona `https://O-TEU-SITE.vercel.app/auth/callback`.
+## Entrar com Google ou Apple (obrigatório para ver o site)
+- Os visitantes entram com **Continue with Google** ou **Continue with Apple**. A conta é criada automaticamente na primeira vez.
+- Só o admin (`123@gmail.com`) entra em `/admin/login` com email e password, e só ele vê **Add site**.
+
+### Supabase → Authentication → URL Configuration
+- *Site URL*: o endereço do site (ex.: `https://mirandafolio.vercel.app`)
+- *Redirect URLs*: adiciona `https://mirandafolio.vercel.app/auth/callback`
+
+### Google (grátis)
+1. https://console.cloud.google.com → cria um projeto → **APIs & Services → OAuth consent screen** → External → preenche nome da app e email → guarda.
+2. **Credentials → Create credentials → OAuth client ID** → *Web application*.
+3. *Authorized redirect URIs*: `https://tuwnnqmrgmxeaiyardqs.supabase.co/auth/v1/callback`
+4. Copia o **Client ID** e o **Client secret**.
+5. Supabase → **Authentication → Sign In / Providers → Google** → ativa e cola os dois → Save.
+
+### Apple (precisa de conta Apple Developer, 99 USD/ano)
+1. https://developer.apple.com/account → **Certificates, Identifiers & Profiles**.
+2. Cria um **App ID** com "Sign in with Apple" e um **Services ID** (este é o Client ID). No Services ID, configura o domínio `tuwnnqmrgmxeaiyardqs.supabase.co` e o Return URL `https://tuwnnqmrgmxeaiyardqs.supabase.co/auth/v1/callback`.
+3. Cria uma **Key** com "Sign in with Apple" e descarrega o ficheiro `.p8`.
+4. Supabase → **Authentication → Sign In / Providers → Apple** → ativa, cola o Services ID e gera o secret com o Team ID, Key ID e o ficheiro .p8 (o Supabase explica no próprio ecrã) → Save.
+5. O secret da Apple expira a cada 6 meses: tens de o gerar outra vez.
